@@ -9,13 +9,41 @@ import {
   NativeSelect,
   Grid,
   GridCol,
+  Image,
+  Center,
+  Title,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { InputPayload } from "../types";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
+import _ from "lodash";
+import { useMemo, useState } from "react";
+import { notifications } from "@mantine/notifications";
 
 const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
+const FormProvider = styled(Grid)`
+  padding: 30px 40px;
+  border-radius: 16px;
+  .mantine-Grid-inner {
+    height: 100%;
+  }
+`;
+
+const Form = styled.form`
+  height: "100%";
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Select = styled(NativeSelect)`
+  .mantine-NativeSelect-input > option:first-of-type {
+    display: none;
+  }
+`;
+
 const inputItems: InputPayload = {
   employee_id: {
     name: "รหัสพนักงาน",
@@ -31,17 +59,17 @@ const inputItems: InputPayload = {
   },
   department: {
     name: "หน่วยงาน",
-    component: NativeSelect,
-    options: ["งานเทคโนโลยีสารสนเทศ", "2"],
+    component: Select,
+    options: ["เลือกตัวเลือก", "งานเทคโนโลยีสารสนเทศ", "2"],
   },
   tel: {
     name: "เบอร์ติดต่อ",
-    component: NumberInput,
+    component: TextInput,
   },
   equipment: {
     name: "อุปกรณ์ที่ต้องการยืม",
-    component: NativeSelect,
-    options: ["Notebook", "External"],
+    component: Select,
+    options: ["เลือกตัวเลือก", "Notebook", "External"],
   },
   number: {
     name: "จำนวน",
@@ -65,50 +93,43 @@ const inputItems: InputPayload = {
   },
 };
 
-const FormProvider = styled(Grid)`
-  padding: 30px 40px;
-  border-radius: 16px;
-  .mantine-Grid-inner {
-    height: 100%;
-  }
-`;
-
-const Form = styled.form`
-  height: "100%";
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-
 const Checkcondition = (condition: boolean, ans: string): string | null => {
   return condition ? ans : null;
 };
 
 // For call get rows
 // const fetchData = async () => await (await fetch(`${API}`)).json();
+const init = {
+  employee_id: "",
+  full_name: "",
+  position: "",
+  department: "",
+  tel: "",
+  equipment: "",
+  number: 0,
+  purpose: "",
+  location: "",
+  start_date_time: null,
+  end_date_time: null,
+};
+type initType = typeof init;
+const CheckObject = (obj1: initType, obj2: any): boolean => {
+  return !Object.entries(obj1)
+    .map(([k, v]) => {
+      return obj2[k] !== v;
+    })
+    .includes(false);
+};
 
 function ContactUs() {
   const form = useForm({
-    initialValues: {
-      employee_id: "",
-      full_name: "",
-      position: "",
-      department: "",
-      tel: 0,
-      equipment: "",
-      number: 0,
-      purpose: "",
-      location: "",
-      start_date_time: null,
-      end_date_time: null,
-    },
+    initialValues: init,
 
     validate: {
       employee_id: (value) =>
         Checkcondition(
           // `${value}`.length < 8 && `${value}`.length < 10,
-          `${value}`.length < 8,
+          !/^\d{8}$/.test(`${value}`),
           "โปรดใส่รหัสพนักงานให้ถูกต้อง"
         ),
       full_name: (value) =>
@@ -118,7 +139,10 @@ function ContactUs() {
       department: (value) =>
         Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
       tel: (value) =>
-        Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(
+          !/^\d{4,10}$/.test(`${value}`),
+          "โปรดใส่รหัสพนักงานให้ถูกต้อง"
+        ),
       equipment: (value) =>
         Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
       number: (value) =>
@@ -146,6 +170,7 @@ function ContactUs() {
     },
   });
   const AddRow = async (data: any) => {
+    setLoading(true);
     dayjs.locale("th");
     const startDateTime = dayjs(data.start_date_time).add(543, "year");
     const endDateTime = dayjs(data.end_date_time).add(543, "year");
@@ -169,13 +194,24 @@ function ContactUs() {
     };
 
     try {
-      const resp = await fetch(`${API}`, {
+      await fetch(`${API}`, {
         method: "POST",
         body: JSON.stringify(payload),
       });
-      console.warn(await resp.json());
+      notifications.show({
+        title: "แจ้งผลดำเนินการ",
+        message: "ขอคำร้องสำเร็จ",
+      });
+
+      setLoading(false);
     } catch (error) {
+      notifications.show({
+        title: "แจ้งผลดำเนินการ",
+        message: "ขอคำร้องไม่สำเร็จ",
+        color: "red",
+      });
       console.error(error);
+      setLoading(false);
     }
   };
 
@@ -191,17 +227,32 @@ function ContactUs() {
       </GridCol>
     );
   });
-
+  const valid = useMemo(() => CheckObject(init, form.values), [form.values]);
+  const [loading, setLoading] = useState(false);
   return (
-    <Container fluid h={`100vh`} w={`100%`} bg="#ececec" p={50}>
+    <Container fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
       <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
-        <Box component={GridCol} span={6}></Box>
+        <Box component={GridCol} span={6}>
+          <Center h={`100%`}>
+            <Image radius="lg" src={"/logo.png"} w={"90%"} />
+          </Center>
+        </Box>
         <Box component={GridCol} span={6} h={`100%`} display={"flex"}>
           <Form onSubmit={form.onSubmit(AddRow)}>
+            <Title size="h4">Change</Title>
             <Grid h={`80%`} py={20}>
               {renderInputList}
             </Grid>
-            <Button type="submit" mt="lg" w={"40%"}>
+            <Button
+              className={`btn ${!valid ? "hidden" : ""}`}
+              type="submit"
+              mt="lg"
+              w={"40%"}
+              variant="gradient"
+              loading={loading}
+              gradient={{ from: "#3f9c85", to: "#1d566a", deg: 100 }}
+              disabled={!valid}
+            >
               Submit
             </Button>
           </Form>
@@ -210,5 +261,11 @@ function ContactUs() {
     </Container>
   );
 }
+
+export const getStaticProps = async () => {
+  return {
+    props: {},
+  };
+};
 
 export default ContactUs;
