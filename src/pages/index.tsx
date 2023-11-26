@@ -20,7 +20,6 @@ import "dayjs/locale/th";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { notifications } from "@mantine/notifications";
-import { useEffect } from 'react';
 
 const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
 const FormProvider = styled(Grid)`
@@ -230,10 +229,6 @@ function ContactUs() {
   });
   const valid = useMemo(() => CheckObject(init, form.values), [form.values]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    document.title = 'ระบบขอใช้งานแุปกรณ์ IT';
-  });
   return (
     <Container fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
       <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
@@ -244,7 +239,7 @@ function ContactUs() {
         </Box>
         <Box component={GridCol} span={6} h={`100%`} display={"flex"}>
           <Form onSubmit={form.onSubmit(AddRow)}>
-            <Title size="h4">Change</Title>
+            <Title size="h4">แบบฟอร์มขอใช้งานอุปกรณ์ IT</Title>
             <Grid h={`80%`} py={20}>
               {renderInputList}
             </Grid>
