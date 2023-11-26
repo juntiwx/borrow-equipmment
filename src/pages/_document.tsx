@@ -6,6 +6,8 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <ColorSchemeScript defaultColorScheme="auto" />
+        <link rel="shortcut icon" href="/logo.png" />
+        <title>แบบฟอร์มกรอกข้อมูลขอใช้งานอุปกรณ์ IT</title>
       </Head>
       <body>
         <Main />

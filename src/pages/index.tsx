@@ -232,11 +232,6 @@ function ContactUs() {
 
   return (
     <Container fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
-      <Helmet>
-        <meta charSet="utf-8" />
-        <title>My Title</title>
-        <link rel="icon" href="/logo.png" />
-      </Helmet>
       <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
         <Box component={GridCol} span={6}>
           <Center h={`100%`}>
