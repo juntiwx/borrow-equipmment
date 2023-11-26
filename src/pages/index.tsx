@@ -22,10 +22,6 @@ import { useMemo, useState } from "react";
 import { notifications } from "@mantine/notifications";
 import { useEffect } from 'react';
 
-useEffect(() => {
-  document.title = 'ระบบขอใช้งานอุปกรณ์ IT';
-});
-
 const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
 const FormProvider = styled(Grid)`
   padding: 30px 40px;
@@ -219,7 +215,6 @@ function ContactUs() {
       setLoading(false);
     }
   };
-
   const renderInputList = Object.entries(inputItems).map(([k, v], i) => {
     return (
       <GridCol span={6} key={`${k}-${i}`}>
@@ -234,6 +229,9 @@ function ContactUs() {
   });
   const valid = useMemo(() => CheckObject(init, form.values), [form.values]);
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    document.title = 'ระบบขอใช้งานอุปกรณ์ IT';
+  });
   return (
     <Container fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
       <img src={"/logo.png"} alt="My Logo" />
