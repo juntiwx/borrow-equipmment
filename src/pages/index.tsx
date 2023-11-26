@@ -20,7 +20,7 @@ import "dayjs/locale/th";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { notifications } from "@mantine/notifications";
-import { useEffect } from 'react';
+import { Helmet } from "react-helmet";
 
 const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
 const FormProvider = styled(Grid)`
@@ -229,12 +229,14 @@ function ContactUs() {
   });
   const valid = useMemo(() => CheckObject(init, form.values), [form.values]);
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    document.title = 'ระบบขอใช้งานอุปกรณ์ IT';
-  });
+
   return (
     <Container fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
-      <img src={"/logo.png"} alt="My Logo" />
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>My Title</title>
+        <link rel="icon" href="/logo.png" />
+      </Helmet>
       <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
         <Box component={GridCol} span={6}>
           <Center h={`100%`}>
