@@ -9,7 +9,7 @@ export default function Document() {
         <link rel="shortcut icon" href="/logo.png" />
         <title>แบบฟอร์มกรอกข้อมูลขอใช้งานอุปกรณ์ IT</title>
       </Head>
-      <body className='font-style'>
+      <body>
         <Main />
         <NextScript />
       </body>

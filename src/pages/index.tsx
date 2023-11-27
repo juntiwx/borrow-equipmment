@@ -230,7 +230,7 @@ function ContactUs() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <Container fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
+    <Container className={`font-style`} fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
       <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
         <Box component={GridCol} span={6}>
           <Center h={`100%`}>
