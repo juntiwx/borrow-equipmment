@@ -8,6 +8,14 @@
   font-family: 'Athiti', sans-serif;
 }
 
+select>option {
+  font-family: 'Athiti', sans-serif;
+}
+
+.mantine-Input-input{
+  font-family: 'Athiti', sans-serif;
+}
+
 .btn {
   transition: all 0.2s ease;
   transform: translate(0px, 0px) !important;

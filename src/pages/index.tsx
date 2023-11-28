@@ -239,7 +239,7 @@ function ContactUs() {
         </Box>
         <Box component={GridCol} span={6} h={`100%`} display={"flex"}>
           <Form onSubmit={form.onSubmit(AddRow)}>
-            <Title size="h4">เพิ่มรายการที่ต้องการยืมอุปกรณ์ IT</Title>
+            <Title className={`font-style`} size="h4">เพิ่มรายการที่ต้องการยืมอุปกรณ์ IT</Title>
             <Grid h={`80%`} py={20}>
               {renderInputList}
             </Grid>
@@ -247,7 +247,7 @@ function ContactUs() {
               className={`btn ${!valid ? "hidden" : ""}`}
               type="submit"
               mt="lg"
-              w={"40%"}
+              w={"50%"}
               variant="gradient"
               loading={loading}
               gradient={{ from: "#3f9c85", to: "#1d566a", deg: 100 }}
