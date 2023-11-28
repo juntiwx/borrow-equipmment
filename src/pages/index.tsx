@@ -60,7 +60,7 @@ const inputItems: InputPayload = {
   department: {
     name: "หน่วยงาน",
     component: Select,
-    options: ["เลือกตัวเลือก", "งานเทคโนโลยีสารสนเทศ", "2"],
+    options: ["เลือกตัวเลือก", "งานเทคโนโลยีสารสนเทศ", "งานเทคโนโลยีการศึกษา"],
   },
   tel: {
     name: "เบอร์ติดต่อ",
@@ -213,6 +213,7 @@ function ContactUs() {
       console.error(error);
       setLoading(false);
     }
+
   };
   const renderInputList = Object.entries(inputItems).map(([k, v], i) => {
     return (
