@@ -46,49 +46,49 @@ const Select = styled(NativeSelect)`
 
 const inputItems: InputPayload = {
   employee_id: {
-    name: "รหัสพนักงาน",
+    name: "Employee ID (รหัสพนักงาน) *",
     component: TextInput,
   },
   full_name: {
-    name: "ชื่อ สกุล",
+    name: "Full name (ชื่อ สกุล) *",
     component: TextInput,
   },
   position: {
-    name: "ตำแหน่ง",
+    name: "Position (ตำแหน่ง) *",
     component: TextInput,
   },
   department: {
-    name: "หน่วยงาน",
+    name: "Section (หน่วยงาน) *",
     component: Select,
     options: ["เลือกตัวเลือก", "งานเทคโนโลยีสารสนเทศ", "งานเทคโนโลยีการศึกษา"],
   },
   tel: {
-    name: "เบอร์ติดต่อ",
+    name: "Tel (เบอร์ติดต่อ) *",
     component: TextInput,
   },
   equipment: {
-    name: "อุปกรณ์ที่ต้องการยืม",
+    name: "Equipment (อุปกรณ์ที่ต้องการยืม) *",
     component: Select,
     options: ["เลือกตัวเลือก", "Notebook", "External"],
   },
   number: {
-    name: "จำนวน",
+    name: "Unit (จำนวน) *",
     component: NumberInput,
   },
   purpose: {
-    name: "วัตถุประสงค์การใช้งาน",
+    name: "Purpose (วัตถุประสงค์การใช้งาน) *",
     component: TextInput,
   },
   start_date_time: {
-    name: "วันเวลา เริ่มใช้งาน",
+    name: "Date time start (วันเวลา เริ่มใช้งาน) *",
     component: DateTimePicker,
   },
   end_date_time: {
-    name: "วันเวลา สิ้นสุดใช้งาน",
+    name: "Date time end (วันเวลา สิ้นสุดใช้งาน) *",
     component: DateTimePicker,
   },
   location: {
-    name: "สถานที่ใช้งาน",
+    name: "Location (สถานที่ใช้งาน) *",
     component: TextInput,
   },
 };
