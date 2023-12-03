@@ -1,4 +1,4 @@
-const SheetID = "1Y7ED307UPHP6S3GxhcdyEPtZgoVW6KSRahJtfKBVU5k"
+const SheetID = "1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk"
 const headerList = {
     "employee_id": true,
     "full_name": true,
@@ -54,4 +54,89 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents)
     createRecord(data)
     return responseJSON(data)
+}
+
+
+//set menu on google sheet
+function onOpen() {
+    const ui = SpreadsheetApp.getUi();
+    const menu = ui.createMenu('Autofill google docs')
+    menu.addItem('Create new document', 'createNewGoogleDocs')
+    menu.addToUi();
+}
+
+function createNewGoogleDocs() {
+    //   const googleDocTemplate = DriveApp.getFileById('1Vjldq6qKBwkZdh7F_CueF4M8VSVee1-qjtrl6T2s6nk');
+    const googleDocTemplate = DriveApp.getFileById('1epSN22x2XyqnT1HSSi8bh_aNdkObXIvUvCK431ThZnc');
+    const destinationFolder = DriveApp.getFolderById('1kSZr4sIbo9bY87Z_RR016EYwn47aSsvG');
+
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+
+    const rows = sheet.getDataRange().getValues();
+
+    for (let i = 1; i < rows.length; i++) {
+
+        if (rows[i][13] === '') {
+
+            // Get the row data
+            const rowData = rows[i];
+
+            const copy = googleDocTemplate.makeCopy(`${rowData[0]} ${rowData[1]} วันที่ร้องขอ ${rowData[11]}`, destinationFolder);
+            const doc = DocumentApp.openById(copy.getId());
+
+            // Access the Google Docs body
+            const body = doc.getBody();
+
+            // Replace placeholders in the document with the row data
+            // Customize this part based on your specific Google Docs structure
+            body.replaceText('{{employee_id}}', rowData[0]);
+            body.replaceText('{{full_name}}', rowData[1]);
+            body.replaceText('{{position}}', rowData[2]);
+            body.replaceText('{{department}}', rowData[3]);
+            body.replaceText('{{tel}}', rowData[4]);
+            body.replaceText('{{equipment}}', rowData[5]);
+            body.replaceText('{{number}}', rowData[6]);
+            body.replaceText('{{purpose}}', rowData[7]);
+            body.replaceText('{{location}}', rowData[8]);
+            body.replaceText('{{start_date_time}}', rowData[9]);
+            body.replaceText('{{end_date_time}}', rowData[10]);
+            body.replaceText('{{date_request}}', rowData[11]);
+            body.replaceText('{{time_request}}', rowData[12]);
+            // Add more replaceText lines for additional placeholders
+
+            // Save and close the document
+            doc.saveAndClose();
+            
+            const url = doc.getUrl();
+            sheet.getRange(i + 1, 14).setValue(url);
+        }
+    }
+    /* rows.forEach(function (row, index) {
+        if (index === 0) return
+
+        if (index[14] === '') return
+
+        const copy = googleDocTemplate.makeCopy(`${row[0]} ${row[1]} วันที่ร้องขอ ${row[11]}`, destinationFolder);
+        const doc = DocumentApp.openById(copy.getId());
+        const body = doc.getBody();
+
+        body.replaceText('{{employee_id}}', row[0]);
+        body.replaceText('{{full_name}}', row[1]);
+        body.replaceText('{{position}}', row[2]);
+        body.replaceText('{{department}}', row[3]);
+        body.replaceText('{{tel}}', row[4]);
+        body.replaceText('{{equipment}}', row[5]);
+        body.replaceText('{{number}}', row[6]);
+        body.replaceText('{{purpose}}', row[7]);
+        body.replaceText('{{location}}', row[8]);
+        body.replaceText('{{start_date_time}}', row[9]);
+        body.replaceText('{{end_date_time}}', row[10]);
+        body.replaceText('{{date_request}}', row[11]);
+        body.replaceText('{{time_request}}', row[12]);
+
+        doc.saveAndClose();
+
+        const url = doc.getUrl();
+        sheet.getRange(index + 1, 14).setValue(url);
+    }) */
 }
