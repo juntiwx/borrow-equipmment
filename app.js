@@ -66,7 +66,7 @@ function onOpen() {
 }
 
 function createNewGoogleDocs() {
-    //   const googleDocTemplate = DriveApp.getFileById('1Vjldq6qKBwkZdh7F_CueF4M8VSVee1-qjtrl6T2s6nk');
+    /*const googleDocTemplate = DriveApp.getFileById('1Vjldq6qKBwkZdh7F_CueF4M8VSVee1-qjtrl6T2s6nk');*/
     const googleDocTemplate = DriveApp.getFileById('1epSN22x2XyqnT1HSSi8bh_aNdkObXIvUvCK431ThZnc');
     const destinationFolder = DriveApp.getFolderById('1kSZr4sIbo9bY87Z_RR016EYwn47aSsvG');
 
@@ -111,32 +111,4 @@ function createNewGoogleDocs() {
             sheet.getRange(i + 1, 14).setValue(url);
         }
     }
-    /* rows.forEach(function (row, index) {
-        if (index === 0) return
-
-        if (index[14] === '') return
-
-        const copy = googleDocTemplate.makeCopy(`${row[0]} ${row[1]} วันที่ร้องขอ ${row[11]}`, destinationFolder);
-        const doc = DocumentApp.openById(copy.getId());
-        const body = doc.getBody();
-
-        body.replaceText('{{employee_id}}', row[0]);
-        body.replaceText('{{full_name}}', row[1]);
-        body.replaceText('{{position}}', row[2]);
-        body.replaceText('{{department}}', row[3]);
-        body.replaceText('{{tel}}', row[4]);
-        body.replaceText('{{equipment}}', row[5]);
-        body.replaceText('{{number}}', row[6]);
-        body.replaceText('{{purpose}}', row[7]);
-        body.replaceText('{{location}}', row[8]);
-        body.replaceText('{{start_date_time}}', row[9]);
-        body.replaceText('{{end_date_time}}', row[10]);
-        body.replaceText('{{date_request}}', row[11]);
-        body.replaceText('{{time_request}}', row[12]);
-
-        doc.saveAndClose();
-
-        const url = doc.getUrl();
-        sheet.getRange(index + 1, 14).setValue(url);
-    }) */
 }
