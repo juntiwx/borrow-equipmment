@@ -2,19 +2,25 @@
 @tailwind components;
 @tailwind utilities; */
 
-@import url('https://fonts.googleapis.com/css2?family=Athiti:wght@300;400;500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Athiti:wght@300;400;500&display=swap");
 
 /* .font-style {
   font-family: 'Athiti', sans-serif;
+}*/
+
+.mantine-InputWrapper-label {
+  font-size: 15px;
 }
 
-select>option {
-  font-family: 'Athiti', sans-serif;
+.mantine-Input-input {
+  font-family: "Athiti", sans-serif;
+  font-size: 15px;
 }
 
-.mantine-Input-input{
-  font-family: 'Athiti', sans-serif;
-} */
+select > option {
+  font-family: "Athiti", sans-serif;
+  font-size: 15px;
+}
 
 .btn {
   transition: all 0.2s ease;

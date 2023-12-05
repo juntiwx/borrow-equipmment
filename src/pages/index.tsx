@@ -20,13 +20,19 @@ import "dayjs/locale/th";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { notifications } from "@mantine/notifications";
-import { Athiti } from 'next/font/google';
+import { Athiti } from "next/font/google";
 
 const athiti = Athiti({
-  weight: '400', // if single weight, otherwise you use array like [400, 500, 700],
-  style: 'normal', // if single style, otherwise you use array like ['normal', 'italic']
-  subsets: ['latin'],
-})
+  weight: "400", // if single weight, otherwise you use array like [400, 500, 700],
+  style: "normal", // if single style, otherwise you use array like ['normal', 'italic']
+  subsets: ["latin"],
+});
+
+const athitiTitle = Athiti({
+  weight: "500", // if single weight, otherwise you use array like [400, 500, 700],
+  style: "normal", // if single style, otherwise you use array like ['normal', 'italic']
+  subsets: ["latin"],
+});
 
 const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
 const FormProvider = styled(Grid)`
@@ -220,7 +226,6 @@ function ContactUs() {
       console.error(error);
       setLoading(false);
     }
-
   };
   const renderInputList = Object.entries(inputItems).map(([k, v], i) => {
     return (
@@ -238,7 +243,14 @@ function ContactUs() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <Container className={athiti.className} fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
+    <Container
+      className={athiti.className}
+      fluid
+      h={`100vh`}
+      w={`100%`}
+      bg="#ececc6"
+      p={50}
+    >
       <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
         <Box component={GridCol} span={6}>
           <Center h={`100%`}>
@@ -247,7 +259,9 @@ function ContactUs() {
         </Box>
         <Box component={GridCol} span={6} h={`100%`} display={"flex"}>
           <Form onSubmit={form.onSubmit(AddRow)}>
-            <Title size="h4">เพิ่มรายการที่ต้องการยืมอุปกรณ์ IT</Title>
+            <Title className={athitiTitle.className} size="h3">
+              เพิ่มรายการที่ต้องการยืมอุปกรณ์ IT
+            </Title>
             <Grid h={`80%`} py={20}>
               {renderInputList}
             </Grid>
