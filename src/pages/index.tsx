@@ -22,6 +22,8 @@ import { useEffect, useMemo, useState } from "react";
 import { notifications } from "@mantine/notifications";
 import { Athiti } from "next/font/google";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import Link from "next/link";
+import Head from "next/head";
 
 const athiti = Athiti({
   weight: "400", // if single weight, otherwise you use array like [400, 500, 700],
@@ -233,12 +235,6 @@ const CheckObject = (obj1: initType, obj2: any): boolean => {
 
 function ContactUs() {
   const supabaseClient = useSupabaseClient();
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabaseClient.from("borrow").select("*");
-      console.log(data);
-    })();
-  }, []);
 
   const form = useForm({
     initialValues: init,
@@ -348,7 +344,9 @@ function ContactUs() {
 
   return (
     <>
-      <title>แบบฟอร์มกรอกข้อมูลขอใช้งานอุปกรณ์ IT</title>
+      <Head>
+        <title>แบบฟอร์มกรอกข้อมูลขอใช้งานอุปกรณ์ IT</title>
+      </Head>
       <Container
         className={athiti.className}
         fluid
@@ -373,12 +371,7 @@ function ContactUs() {
               </Grid>
 
               <br />
-              <a
-                href="https://docs.google.com/spreadsheets/d/1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk/edit"
-                target="_blank"
-              >
-                รายการข้อมูล โปรด Click !!
-              </a>
+              <Link href="/borrow-list">รายการข้อมูล โปรด Click !!</Link>
               <Button
                 className={`btn ${!valid ? "hidden" : ""}`}
                 type="submit"
@@ -398,11 +391,5 @@ function ContactUs() {
     </>
   );
 }
-
-export const getStaticProps = async () => {
-  return {
-    props: {},
-  };
-};
 
 export default ContactUs;
