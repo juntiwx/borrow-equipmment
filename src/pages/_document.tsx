@@ -1,5 +1,5 @@
-import { Html, Head, Main, NextScript } from 'next/document';
-import { ColorSchemeScript } from '@mantine/core';
+import { Html, Head, Main, NextScript } from "next/document";
+import { ColorSchemeScript } from "@mantine/core";
 
 export default function Document() {
   return (
@@ -7,7 +7,6 @@ export default function Document() {
       <Head>
         <ColorSchemeScript defaultColorScheme="auto" />
         <link rel="shortcut icon" href="/logo.png" />
-        <title>แบบฟอร์มกรอกข้อมูลขอใช้งานอุปกรณ์ IT</title>
       </Head>
       <body>
         <Main />
