@@ -319,6 +319,7 @@ function ContactUs() {
         message: "ขอคำร้องสำเร็จ",
       });
 
+      form.reset();
       setLoading(false);
     } catch (error) {
       notifications.show({
