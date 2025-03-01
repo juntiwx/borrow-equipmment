@@ -1,24 +1,11 @@
 import styled from "@emotion/styled";
 import { useForm } from "@mantine/form";
-import {
-  NumberInput,
-  TextInput,
-  Button,
-  Box,
-  Container,
-  NativeSelect,
-  Grid,
-  GridCol,
-  Image,
-  Center,
-  Title,
-} from "@mantine/core";
+import {NumberInput,TextInput,Button,Box,Container,NativeSelect,Grid,GridCol,Image,Center,Title,} from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { InputPayload } from "../types";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
-import _ from "lodash";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { notifications } from "@mantine/notifications";
 import { Athiti } from "next/font/google";
 
@@ -57,152 +44,6 @@ const Select = styled(NativeSelect)`
   }
 `;
 
-const inputItems: InputPayload = {
-  employee_id: {
-    name: "Employee ID (รหัสพนักงาน) *",
-    component: TextInput,
-  },
-  full_name: {
-    name: "Full name (ชื่อ สกุล) *",
-    component: TextInput,
-  },
-  position: {
-    name: "Position (ตำแหน่ง) *",
-    component: TextInput,
-  },
-  department: {
-    name: "Section (หน่วยงาน) *",
-    component: Select,
-    options: ["เลือกตัวเลือก", 
-    "แผนกบริการวิชาการ",
-    "แผนกสนับสนุนงานบริการ",
-    "กลุ่มกลยุทธ์และพัฒนาวิชาการ",
-    "กลุ่มงานอาคารอทิตยาทร",
-    "กลุ่มบริการวิชาการ",
-    "กลุ่มบัณฑิตศึกษา",
-    "กลุ่มศิษย์เก่าสัมพันธ์และแนะแนวอาชีพ",
-    "กลุ่มสาขาวิชาการจัดการการท่องเที่ยวและการบริการ",
-    "กลุ่มสาขาวิชาจิตรกรรมและศิลปกรรม",
-    "กลุ่มสาขาวิชาบริหารธุรกิจ",
-    "กลุ่มสาขาวิชามนุษยศาสตร์และภาษาต่างประเทศ",
-    "กลุ่มสาขาวิชาวิทยาศาสตร์",
-    "กลุ่มสาขาวิชาสังคมศาสตร์",
-    "คณะผู้บริหาร",
-    "งานเทคโนโลยีการศึกษา",
-    "งานเทคโนโลยีสารสนเทศ",
-    "งานแผนและพัฒนาคุณภาพ",
-    "งานการเงินและบัญชี",
-    "งานการต่างประเทศ",
-    "งานกิจการนักศึกษา",
-    "งานทรัพยากรบุคคล",
-    "งานบริหารกลาง",
-    "งานบริหารการศึกษา",
-    "งานปฏิบัติการและสิ่งแวดล้อม",
-    "งานพัสดุ",
-    "งานรับสมัครและทะเบียนนักศึกษา",
-    "งานส่งเสริมและบริหารการวิจัย",
-    "งานสื่อสารองค์กร",
-    "งานห้องสมุด",
-    "ฝ่ายการคลังและทรัพยากรบุคคล",
-    "ฝ่ายการวางแผนกลยุทธ์และพัฒนาคุณภาพ",
-    "ฝ่ายการศึกษา",
-    "ฝ่ายกิจการนักศึกษา",
-    "ฝ่ายวิเทศสัมพันธ์",
-    "ฝ่ายวิจัยและการบริการวิชาการ",
-    "ฝ่ายสำนักงานคณบดี",
-    "ฝ่ายสิ่งแวดล้อมและการพัฒนาอย่างยั่งยืน",
-    "ฝ่ายสื่อสารองค์กรและสารสนเทศ",
-    "ศูนย์เตรียมความพร้อมภาษาและคณิตศาสตร์",
-    "ศูนย์ปฏิบัติการโรงแรมศาลายาพาวิลเลียน",
-    "สำนักงานคณบดี",
-    "หน่วยเลขานุการ",
-    "หน่วยแนะแนวอาชีพ",
-    "หน่วยแผนติดตามและประเมินผล",
-    "หน่วยแลกเปลี่ยนนักศึกษา",
-    "หน่วยกลยุทธ์วิชาการ",
-    "หน่วยการเงิน",
-    "หน่วยการจัดการทรัพยากรบุคคล",
-    "หน่วยการตลาด",
-    "หน่วยคลังพัสดุ",
-    "หน่วยจัดหาพัสดุ",
-    "หน่วยซ่อมบำรุง",
-    "หน่วยทะเบียนและประเมินผล",
-    "หน่วยที่ปรึกษาทางวิชาการ",
-    "หน่วยธุรการ",
-    "หน่วยบริการเทคโนโลยีการศึกษา",
-    "หน่วยบริการและปฏิบัติการคอมพิวเตอร์",
-    "หน่วยบริการและสวัสดิการนักศึกษา",
-    "หน่วยบริการห้องสมุด (อาคารอทิตยาทร)",
-    "หน่วยบริการห้องสมุด 1  (MUIC อาคาร 1)",
-    "หน่วยบริหารงบประมาณ",
-    "หน่วยบริหารจัดการทรัพยากรสารสนเทศห้องสมุด ",
-    "หน่วยบริหารจัดการอาคาร",
-    "หน่วยบริหารจัดการอาคารและความปลอดภัย",
-    "หน่วยบริหารหลักสูตร",
-    "หน่วยบัญชี",
-    "หน่วยบ้านพักนักศึกษา",
-    "หน่วยประเมินผลการวิจัย",
-    "หน่วยฝึกอบรม",
-    "หน่วยพัฒนาเครือข่ายโครงการที่ปรึกษา",
-    "หน่วยพัฒนาและผลิตสื่อ",
-    "หน่วยพัฒนาโครงการเพื่อสร้างความร่วมมือ",
-    "หน่วยพัฒนาการจัดอันดับมหาวิทยาลัย",
-    "หน่วยพัฒนาความก้าวหน้าทางวิชาชีพ",
-    "หน่วยพัฒนาคุณภาพ",
-    "หน่วยพัฒนาทรัพยากรบุคคล",
-    "หน่วยพัฒนานักศึกษา",
-    "หน่วยพันธกิจสัมพันธ์เพื่อสังคม",
-    "หน่วยระบบคอมพิวเตอร์เครื่องแม่ข่าย",
-    "หน่วยรับสมัครและจัดสอบ",
-    "หน่วยวิเคราะห์และพัฒนาระบบ",
-    "หน่วยวิเทศสัมพันธ์และเครือข่ายต่างประเทศ",
-    "หน่วยวิศวกรรมและระบบอาคาร",
-    "หน่วยวิศวกรรมและสาธารณูปโภค",
-    "หน่วยศิษย์เก่าสัมพันธ์",
-    "หน่วยส่งเสริมการวิจัย",
-    "หน่วยสนับสนุนกลุ่มสาขาวิชา",
-    "หน่วยสนับสนุนบริการบัณฑิตศึกษา",
-    "หน่วยสนับสนุนวิชาการบัณฑิตศึกษา",
-    "หน่วยสนับสนุนอาจารย์",
-    "หน่วยสวัสดิการและสิทธิประโยชน์",
-    "หน่วยสิ่งแวดล้อมและการบริการทั่วไป",
-    "หน่วยสื่อทางการศึกษา",
-    "หน่วยสื่อสารองค์กร",
-    "หน่วยห้องปฏิบัติการวิทยาศาสตร์",
-    
-  ],
-  },
-  tel: {
-    name: "Tel (เบอร์ติดต่อ) *",
-    component: TextInput,
-  },
-  equipment: {
-    name: "Equipment (อุปกรณ์ที่ต้องการยืม) *",
-    component: Select,
-    options: ["เลือกตัวเลือก", "Notebook", "External"],
-  },
-  number: {
-    name: "Unit (จำนวน) *",
-    component: NumberInput,
-  },
-  purpose: {
-    name: "Purpose (วัตถุประสงค์การใช้งาน) *",
-    component: TextInput,
-  },
-  start_date_time: {
-    name: "Date time start (วันเวลา เริ่มใช้งาน) *",
-    component: DateTimePicker,
-  },
-  end_date_time: {
-    name: "Date time end (วันเวลา สิ้นสุดใช้งาน) *",
-    component: DateTimePicker,
-  },
-  location: {
-    name: "Location (สถานที่ใช้งาน) *",
-    component: TextInput,
-  },
-};
-
 const Checkcondition = (condition: boolean, ans: string): string | null => {
   return condition ? ans : null;
 };
@@ -222,6 +63,7 @@ const init = {
   start_date_time: null,
   end_date_time: null,
 };
+
 type initType = typeof init;
 const CheckObject = (obj1: initType, obj2: any): boolean => {
   return !Object.entries(obj1)
@@ -232,6 +74,93 @@ const CheckObject = (obj1: initType, obj2: any): boolean => {
 };
 
 function ContactUs() {
+  // state สำหรับเก็บ options ของ department
+  const [departmentOptions, setDepartmentOptions] = useState(["เลือกตัวเลือก"]);
+  const [equipmentOptions, setEquipmentOptions] = useState(["เลือกตัวเลือก"]);
+  const [loading, setLoading] = useState(false);
+
+  // ดึงข้อมูลจาก Google Sheet โดยเลือกทั้ง column A และ B จาก sheet "select_option"
+  useEffect(() => {
+    const sheetId = "1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk"; // Google Sheet ID ของคุณ
+    const sheetName = "select_option"; // ชื่อ sheet ที่ต้องการดึงข้อมูล
+    const query = "select A, B"; // ดึงข้อมูลจาก column A และ B
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}&tq=${encodeURIComponent(query)}`;
+
+    fetch(url)
+      .then(response => response.text())
+      .then(text => {
+        // ตัด prefix และ suffix ของ JSON ที่ได้ออก
+        const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+        const deptOptions = [];
+        const equipOptions = [];
+        // ข้ามแถวแรก (header) ด้วย slice(1)
+        jsonData.table.rows.slice(1).forEach(row => {
+          if (row.c) {
+            const aVal = row.c[0]?.v;
+            const bVal = row.c[1]?.v;
+            if (aVal) {
+              deptOptions.push(aVal);
+            }
+            if (bVal) {
+              equipOptions.push(bVal);
+            }
+          }
+        });
+        setDepartmentOptions(["เลือกตัวเลือก", ...deptOptions]);
+        setEquipmentOptions(["เลือกตัวเลือก", ...equipOptions]);
+      })
+      .catch(error => console.error("Error fetching data:", error));
+  }, []);
+
+  const inputItems: InputPayload = {
+    employee_id: {
+      name: "Employee ID (รหัสพนักงาน) *",
+      component: TextInput,
+    },
+    full_name: {
+      name: "Full name (ชื่อ สกุล) *",
+      component: TextInput,
+    },
+    position: {
+      name: "Position (ตำแหน่ง) *",
+      component: TextInput,
+    },
+    department: {
+      name: "Section (หน่วยงาน) *",
+      component: Select,
+      options: departmentOptions,
+    },
+    tel: {
+      name: "Tel (เบอร์ติดต่อ) *",
+      component: TextInput,
+    },
+    equipment: {
+      name: "Equipment (อุปกรณ์ที่ต้องการยืม) *",
+      component: Select,
+      options: equipmentOptions,
+    },
+    number: {
+      name: "Unit (จำนวน) *",
+      component: NumberInput,
+    },
+    purpose: {
+      name: "Purpose (วัตถุประสงค์การใช้งาน) *",
+      component: TextInput,
+    },
+    start_date_time: {
+      name: "Date time start (วันเวลา เริ่มใช้งาน) *",
+      component: DateTimePicker,
+    },
+    end_date_time: {
+      name: "Date time end (วันเวลา สิ้นสุดใช้งาน) *",
+      component: DateTimePicker,
+    },
+    location: {
+      name: "Location (สถานที่ใช้งาน) *",
+      component: TextInput,
+    },
+  };
+
   const form = useForm({
     initialValues: init,
 
@@ -240,33 +169,33 @@ function ContactUs() {
         Checkcondition(
           // `${value}`.length < 8 && `${value}`.length < 10,
           !/^\d{8}$/.test(`${value}`),
-          "โปรดใส่รหัสพนักงานให้ถูกต้อง"
+          "โปรดระบุรหัสพนักงานให้ถูกต้อง"
         ),
       full_name: (value) =>
-        Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(`${value}`.length < 3, "โปรดระบุข้อมูลชื่อผู้ยืมอุปกรณ์ให้ถูกต้อง"),
       position: (value) =>
-        Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(`${value}`.length < 3, "โปรดระบุตำแหน่งให้ถูกต้อง"),
       department: (value) =>
-        Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(`${value}`.length < 3, "โปรดระบุหน่วยงานให้ถูกต้อง"),
       tel: (value) =>
         Checkcondition(
           !/^\d{4,10}$/.test(`${value}`),
-          "โปรดใส่รหัสพนักงานให้ถูกต้อง"
+          "โปรดระบุข้อมูลเบอร์ผู้ติดต่อให้ถูกต้อง"
         ),
       equipment: (value) =>
-        Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(`${value}`.length < 3, "โปรดระบุอุปกรณ์ที่ยืมให้ถูกต้อง"),
       number: (value) =>
-        Checkcondition(value < 1, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(value < 1, "โปรดระบุจำนวนให้ถูกต้อง"),
       purpose: (value) =>
-        Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(`${value}`.length < 3, "โปรดระบุเหตุผลการยืมให้ถูกต้อง"),
       location: (value) =>
-        Checkcondition(`${value}`.length < 3, "โปรดใส่รหัสพนักงานให้ถูกต้อง"),
+        Checkcondition(`${value}`.length < 3, "โปรดระบุสถานที่ยืมให้ถูกต้อง"),
       start_date_time: (value, values) => {
         const start = dayjs(value);
         const end = dayjs(values.end_date_time);
         return Checkcondition(
           !start.isBefore(end) || value == null,
-          "โปรดใส่รหัสพนักงานให้ถูกต้อง"
+          "โปรดระบุวันที่เริ่มยืมให้ถูกต้อง"
         );
       },
       end_date_time: (value, values) => {
@@ -274,11 +203,12 @@ function ContactUs() {
         const end = dayjs(value);
         return Checkcondition(
           !end.isAfter(start) || value == null,
-          "โปรดใส่รหัสพนักงานให้ถูกต้อง"
+          "โปรดสิ้นสุดการยืมให้ถูกต้อง"
         );
       },
     },
   });
+
   const AddRow = async (data: any) => {
     setLoading(true);
     dayjs.locale("th");
@@ -324,6 +254,7 @@ function ContactUs() {
       setLoading(false);
     }
   };
+
   const renderInputList = Object.entries(inputItems).map(([k, v], i) => {
     return (
       <GridCol span={6} key={`${k}-${i}`}>
@@ -337,7 +268,6 @@ function ContactUs() {
     );
   });
   const valid = useMemo(() => CheckObject(init, form.values), [form.values]);
-  const [loading, setLoading] = useState(false);
 
   return (
     <Container
