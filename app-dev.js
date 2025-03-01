@@ -18,16 +18,17 @@ const baseHeaders = [
   "time_request"
 ];
 
-// จำนวนคู่คอมพิวเตอร์ที่รองรับ (dynamic fields)
-// ในที่นี้ รองรับ 2 คู่: computer_name_1, asset_number_1, computer_name_2, asset_number_2
-const maxComputers = 2;
+// เปลี่ยนเป็นรองรับ dynamic fields สำหรับ computers 5 คู่
+// รองรับ 5 คู่: computer_name_1, asset_number_1, ... , computer_name_5, asset_number_5
+const maxComputers = 5;
 
 // Helper: อ่าน Sheet
 const getSheet = () => SpreadsheetApp.openById(SheetID).getActiveSheet();
 
 // Helper: ส่ง JSON response
 const responseJSON = (data) =>
-  ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+  ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
 
 // ฟังก์ชัน map payload ให้เป็น Array ตามลำดับ column ที่กำหนด
 const mapPayloadToRow = (data) => {
@@ -108,11 +109,12 @@ function createNewGoogleDocs() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
   const rows = sheet.getDataRange().getValues();
 
-  // สมมติว่า header อยู่ในแถวแรก และ column doc_url อยู่ในตำแหน่งสุดท้าย (index 18)
+  // สมมติว่า header อยู่ในแถวแรก
+  // จำนวน column ในแต่ละแถวจะเป็น: baseHeaders (14) + maxComputers * 2 (10) + doc_url (1) = 25
   for (let i = 1; i < rows.length; i++) {
     const rowData = rows[i];
-    // ถ้า column doc_url (index 18) ว่าง ให้สร้างเอกสารใหม่
-    if (!rowData[18]) {
+    // ถ้า column doc_url (index 24) ว่าง ให้สร้างเอกสารใหม่
+    if (!rowData[24]) {
       // สร้างชื่อเอกสาร โดยใช้ employee_id, full_name และ date_request
       const docName = `${rowData[0]} ${rowData[1]} วันที่ร้องขอ ${rowData[12]}`;
       const copy = googleDocTemplate.makeCopy(docName, destinationFolder);
@@ -125,10 +127,10 @@ function createNewGoogleDocs() {
       });
       
       // แทนที่ placeholder สำหรับ dynamic fields (computers)
-      // placeholder: {{computer_name_1}}, {{asset_number_1}}, {{computer_name_2}}, {{asset_number_2}}
+      // placeholder: {{computer_name_1}}, {{asset_number_1}}, ... , {{computer_name_5}}, {{asset_number_5}}
       for (let j = 0; j < maxComputers; j++) {
-        const compIndex = baseHeaders.length + j * 2; // เริ่มที่ index 14, 16
-        const assetIndex = compIndex + 1;             // index 15, 17
+        const compIndex = baseHeaders.length + j * 2; // เริ่มที่ index 14, 16, 18, 20, 22
+        const assetIndex = compIndex + 1;             // index 15, 17, 19, 21, 23
         body.replaceText(`{{computer_name_${j + 1}}}`, rowData[compIndex]);
         body.replaceText(`{{asset_number_${j + 1}}}`, rowData[assetIndex]);
       }

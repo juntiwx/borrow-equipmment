@@ -100,13 +100,13 @@ function ContactUs() {
     const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}&tq=${encodeURIComponent(query)}`;
 
     fetch(url)
-      .then(response => response.text())
-      .then(text => {
+      .then((response) => response.text())
+      .then((text) => {
         const jsonData = JSON.parse(text.substr(47).slice(0, -2));
         const deptOptions: string[] = [];
         const equipOptions: string[] = [];
         // ข้าม header ด้วย slice(1)
-        jsonData.table.rows.slice(1).forEach(row => {
+        jsonData.table.rows.slice(1).forEach((row) => {
           if (row.c) {
             const aVal = row.c[0]?.v;
             const bVal = row.c[1]?.v;
@@ -121,7 +121,7 @@ function ContactUs() {
         setDepartmentOptions(["เลือกตัวเลือก", ...deptOptions]);
         setEquipmentOptions(["เลือกตัวเลือก", ...equipOptions]);
       })
-      .catch(error => console.error("Error fetching data:", error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   // กำหนด input fields เบื้องต้น (ไม่รวม dynamic fields สำหรับ computers)
@@ -155,6 +155,8 @@ function ContactUs() {
     number: {
       name: "Unit (จำนวน) *",
       component: NumberInput,
+      max: 5, // เพิ่ม property max ให้กับ NumberInput
+      description: "จำกัดสูงสุด 5", // เพิ่มข้อความด้านล่างช่อง number
     },
     purpose: {
       name: "Purpose (วัตถุประสงค์การใช้งาน) *",
@@ -189,8 +191,9 @@ function ContactUs() {
         Checkcondition(!/^\d{4,10}$/.test(`${value}`), "โปรดระบุข้อมูลเบอร์ผู้ติดต่อให้ถูกต้อง"),
       equipment: (value) =>
         Checkcondition(`${value}`.length < 3, "โปรดระบุอุปกรณ์ที่ยืมให้ถูกต้อง"),
+      // validate สำหรับ number: ค่าต้องอยู่ระหว่าง 1 ถึง 5
       number: (value) =>
-        Checkcondition(value < 1, "โปรดระบุจำนวนให้ถูกต้อง"),
+        Checkcondition(value < 1 || value > 5, "โปรดระบุจำนวนให้ถูกต้อง (สูงสุด 5)"),
       purpose: (value) =>
         Checkcondition(`${value}`.length < 3, "โปรดระบุเหตุผลการยืมให้ถูกต้อง"),
       location: (value) =>
@@ -219,9 +222,9 @@ function ContactUs() {
     },
   });
 
-  // เมื่อค่า number เปลี่ยน ให้ปรับปรุง array ของ computers ตามจำนวนที่กรอก
+  // เมื่อค่า number เปลี่ยน ให้ปรับปรุง array ของ computers ตามจำนวนที่กรอก (จำกัดสูงสุด 5)
   useEffect(() => {
-    const count = form.values.number;
+    const count = Math.min(form.values.number, 5);
     const currentComputers = form.values.computers || [];
     let computerItems = [...currentComputers];
     if (computerItems.length < count) {
@@ -248,8 +251,8 @@ function ContactUs() {
     const formattedCurrentDate = currentDate.format("D เดือน MMMM ปี YYYY");
     const currentTime = currentDate.format("HH:mm");
 
-    // สมมติรองรับ dynamic field สำหรับ computers 2 คู่
-    const maxComputers = 2;
+    // รองรับ dynamic fields สำหรับ computers 5 คู่
+    const maxComputers = 5;
 
     // สร้าง row array โดยเรียงลำดับให้ตรงตาม column ที่กำหนดไว้
     // ลำดับ: employee_id, full_name, template, position, department, tel, equipment, number,
@@ -303,8 +306,6 @@ function ContactUs() {
     }
   };
 
-
-
   // Render fields ที่กำหนดไว้ใน inputItems
   const renderInputList = Object.entries(inputItems).map(([k, v], i) => {
     return (
@@ -314,6 +315,8 @@ function ContactUs() {
           data={v.options}
           placeholder={v.name}
           {...form.getInputProps(`${k}`)}
+          {...(v.max ? { max: v.max } : {})}
+          {...(v.description ? { description: v.description } : {})}
         />
       </GridCol>
     );
