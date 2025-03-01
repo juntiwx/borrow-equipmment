@@ -9,7 +9,6 @@ import {
   NativeSelect,
   Grid,
   GridCol,
-  Image,
   Center,
   Title,
 } from "@mantine/core";
@@ -35,20 +34,24 @@ const athitiTitle = Athiti({
 
 const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
 
+// ปรับปรุง FormProvider ให้มี scroll เมื่อเนื้อหามีความยาวเกิน
 const FormProvider = styled(Grid)`
   padding: 30px 40px;
   border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 80vh; /* กำหนดความสูงสูงสุด */
+  overflow-y: auto; /* ให้มี scroll เมื่อเนื้อหาล้น */
   .mantine-Grid-inner {
     height: 100%;
   }
 `;
 
 const Form = styled.form`
-  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 `;
 
 const Select = styled(NativeSelect)`
@@ -57,11 +60,10 @@ const Select = styled(NativeSelect)`
   }
 `;
 
-const Checkcondition = (condition: boolean, ans: string): string | null => {
-  return condition ? ans : null;
-};
+const Checkcondition = (condition: boolean, ans: string): string | null =>
+  condition ? ans : null;
 
-// เพิ่ม key computers เพื่อเก็บ array ของ dynamic fields (computer name & asset number)
+// ฟิลด์พื้นฐานพร้อม dynamic fields computers
 const init = {
   employee_id: "",
   full_name: "",
@@ -69,30 +71,25 @@ const init = {
   department: "",
   tel: "",
   equipment: "",
-  number: 0,
   purpose: "",
-  location: "",
   start_date_time: null,
   end_date_time: null,
+  location: "",
+  number: 0,
   computers: [] // ตัวอย่าง: [{ computer_name: "", asset_number: "" }]
 };
 
 type initType = typeof init;
-const CheckObject = (obj1: initType, obj2: any): boolean => {
-  return !Object.entries(obj1)
-    .map(([k, v]) => {
-      return obj2[k] !== v;
-    })
+const CheckObject = (obj1: initType, obj2: any): boolean =>
+  !Object.entries(obj1)
+    .map(([k, v]) => obj2[k] !== v)
     .includes(false);
-};
 
 function ContactUs() {
-  // state สำหรับเก็บ options ของ department และ equipment
   const [departmentOptions, setDepartmentOptions] = useState(["เลือกตัวเลือก"]);
   const [equipmentOptions, setEquipmentOptions] = useState(["เลือกตัวเลือก"]);
   const [loading, setLoading] = useState(false);
 
-  // ดึงข้อมูล options จาก Google Sheet (select_option)
   useEffect(() => {
     const sheetId = "1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk";
     const sheetName = "select_option";
@@ -105,17 +102,12 @@ function ContactUs() {
         const jsonData = JSON.parse(text.substr(47).slice(0, -2));
         const deptOptions: string[] = [];
         const equipOptions: string[] = [];
-        // ข้าม header ด้วย slice(1)
         jsonData.table.rows.slice(1).forEach((row) => {
           if (row.c) {
             const aVal = row.c[0]?.v;
             const bVal = row.c[1]?.v;
-            if (aVal) {
-              deptOptions.push(aVal);
-            }
-            if (bVal) {
-              equipOptions.push(bVal);
-            }
+            if (aVal) deptOptions.push(aVal);
+            if (bVal) equipOptions.push(bVal);
           }
         });
         setDepartmentOptions(["เลือกตัวเลือก", ...deptOptions]);
@@ -124,55 +116,22 @@ function ContactUs() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  // กำหนด input fields เบื้องต้น (ไม่รวม dynamic fields สำหรับ computers)
+  // ปรับลำดับ input fields โดย Unit (จำนวน) จะอยู่หลัง Location
   const inputItems: InputPayload = {
-    employee_id: {
-      name: "Employee ID (รหัสพนักงาน) *",
-      component: TextInput,
-    },
-    full_name: {
-      name: "Full name (ชื่อ สกุล) *",
-      component: TextInput,
-    },
-    position: {
-      name: "Position (ตำแหน่ง) *",
-      component: TextInput,
-    },
-    department: {
-      name: "Section (หน่วยงาน) *",
-      component: Select,
-      options: departmentOptions,
-    },
-    tel: {
-      name: "Tel (เบอร์ติดต่อ) *",
-      component: TextInput,
-    },
-    equipment: {
-      name: "Equipment (อุปกรณ์ที่ต้องการยืม) *",
-      component: Select,
-      options: equipmentOptions,
-    },
+    employee_id: { name: "Employee ID (รหัสพนักงาน) *", component: TextInput },
+    full_name: { name: "Full name (ชื่อ สกุล) *", component: TextInput },
+    position: { name: "Position (ตำแหน่ง) *", component: TextInput },
+    department: { name: "Section (หน่วยงาน) *", component: Select, options: departmentOptions },
+    tel: { name: "Tel (เบอร์ติดต่อ) *", component: TextInput },
+    equipment: { name: "Equipment (อุปกรณ์ที่ต้องการยืม) *", component: Select, options: equipmentOptions },
+    purpose: { name: "Purpose (วัตถุประสงค์การใช้งาน) *", component: TextInput },
+    start_date_time: { name: "Date time start (วันเวลา เริ่มใช้งาน) *", component: DateTimePicker },
+    end_date_time: { name: "Date time end (วันเวลา สิ้นสุดใช้งาน) *", component: DateTimePicker },
+    location: { name: "Location (สถานที่ใช้งาน) *", component: TextInput },
     number: {
-      name: "Unit (จำนวน) *",
+      name: "Unit (จำนวน) * (จำกัดสูงสุด 5)",
       component: NumberInput,
-      max: 5, // เพิ่ม property max ให้กับ NumberInput
-      description: "จำกัดสูงสุด 5", // เพิ่มข้อความด้านล่างช่อง number
-    },
-    purpose: {
-      name: "Purpose (วัตถุประสงค์การใช้งาน) *",
-      component: TextInput,
-    },
-    start_date_time: {
-      name: "Date time start (วันเวลา เริ่มใช้งาน) *",
-      component: DateTimePicker,
-    },
-    end_date_time: {
-      name: "Date time end (วันเวลา สิ้นสุดใช้งาน) *",
-      component: DateTimePicker,
-    },
-    location: {
-      name: "Location (สถานที่ใช้งาน) *",
-      component: TextInput,
+      max: 5,
     },
   };
 
@@ -191,7 +150,6 @@ function ContactUs() {
         Checkcondition(!/^\d{4,10}$/.test(`${value}`), "โปรดระบุข้อมูลเบอร์ผู้ติดต่อให้ถูกต้อง"),
       equipment: (value) =>
         Checkcondition(`${value}`.length < 3, "โปรดระบุอุปกรณ์ที่ยืมให้ถูกต้อง"),
-      // validate สำหรับ number: ค่าต้องอยู่ระหว่าง 1 ถึง 5
       number: (value) =>
         Checkcondition(value < 1 || value > 5, "โปรดระบุจำนวนให้ถูกต้อง (สูงสุด 5)"),
       purpose: (value) =>
@@ -208,7 +166,6 @@ function ContactUs() {
         const end = dayjs(value);
         return Checkcondition(!end.isAfter(start) || value == null, "โปรดสิ้นสุดการยืมให้ถูกต้อง");
       },
-      // Validate สำหรับ dynamic fields computers
       computers: (value) => {
         if (Array.isArray(value)) {
           for (let i = 0; i < value.length; i++) {
@@ -222,18 +179,16 @@ function ContactUs() {
     },
   });
 
-  // เมื่อค่า number เปลี่ยน ให้ปรับปรุง array ของ computers ตามจำนวนที่กรอก (จำกัดสูงสุด 5)
+  // ปรับจำนวน dynamic fields สำหรับ computers ตามค่า number (จำกัดสูงสุด 5)
   useEffect(() => {
     const count = Math.min(form.values.number, 5);
     const currentComputers = form.values.computers || [];
     let computerItems = [...currentComputers];
     if (computerItems.length < count) {
-      // เพิ่มรายการใหม่
       for (let i = computerItems.length; i < count; i++) {
         computerItems.push({ computer_name: "", asset_number: "" });
       }
     } else if (computerItems.length > count) {
-      // ตัดรายการส่วนเกินออก
       computerItems = computerItems.slice(0, count);
     }
     form.setFieldValue("computers", computerItems);
@@ -251,30 +206,26 @@ function ContactUs() {
     const formattedCurrentDate = currentDate.format("D เดือน MMMM ปี YYYY");
     const currentTime = currentDate.format("HH:mm");
 
-    // รองรับ dynamic fields สำหรับ computers 5 คู่
-    const maxComputers = 5;
-
-    // สร้าง row array โดยเรียงลำดับให้ตรงตาม column ที่กำหนดไว้
-    // ลำดับ: employee_id, full_name, template, position, department, tel, equipment, number,
-    // purpose, location, start_date_time, end_date_time, date_request, time_request
+    // สร้าง row array โดยเปลี่ยนตำแหน่งของ Unit (จำนวน) ให้อยู่หลัง Location
     const row = [
       data.employee_id,
       data.full_name,
-      data.template || "", // หากไม่มีข้อมูล template ส่งค่าว่าง
+      data.template || "",
       data.position,
       data.department,
       data.tel,
       data.equipment,
-      data.number,
       data.purpose,
       data.location,
+      data.number, // Unit (จำนวน) อยู่หลัง Location
       formattedStartDateTime,
       formattedEndDateTime,
       formattedCurrentDate,
       currentTime,
     ];
 
-    // เติมข้อมูลสำหรับ dynamic fields: computer_name_i และ asset_number_i
+    // เติมข้อมูล dynamic fields สำหรับ computers (รองรับ 5 คู่)
+    const maxComputers = 5;
     for (let i = 0; i < maxComputers; i++) {
       if (data.computers && data.computers[i]) {
         row.push(data.computers[i].computer_name || "");
@@ -306,25 +257,24 @@ function ContactUs() {
     }
   };
 
-  // Render fields ที่กำหนดไว้ใน inputItems
+  // เปลี่ยน span เป็น 4 สำหรับฟิลด์ทั่วไป แต่สำหรับ Location ให้ใช้ span 8
   const renderInputList = Object.entries(inputItems).map(([k, v], i) => {
+    const colSpan = k === "location" ? 8 : 4;
     return (
-      <GridCol span={6} key={`${k}-${i}`}>
+      <GridCol span={colSpan} key={`${k}-${i}`}>
         <v.component
           label={v.name}
           data={v.options}
           placeholder={v.name}
           {...form.getInputProps(`${k}`)}
           {...(v.max ? { max: v.max } : {})}
-          {...(v.description ? { description: v.description } : {})}
         />
       </GridCol>
     );
   });
 
-  // Render dynamic fields สำหรับ computer name และ asset number
   const renderComputerFields = form.values.computers.map((item: any, index: number) => (
-    <GridCol span={6} key={`computer-${index}`}>
+    <GridCol span={4} key={`computer-${index}`}>
       <TextInput
         label={`Computer Name ${index + 1}`}
         placeholder="Computer Name"
@@ -341,41 +291,37 @@ function ContactUs() {
   const valid = useMemo(() => CheckObject(init, form.values), [form.values]);
 
   return (
-    <Container className={athiti.className} fluid h={`100vh`} w={`100%`} bg="#ececc6" p={50}>
-      <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
-        <Box component={GridCol} span={6}>
-          <Center h={`100%`}>
-            <Image radius="lg" src={"/logo.png"} w={"90%"} />
-          </Center>
-        </Box>
-        <Box component={GridCol} span={6} h={`100%`} display={"flex"}>
+    <Container className={athiti.className} fluid h="100vh" w="100%" bg="#ececc6" p={50}>
+      <FormProvider h="100%" w="100%">
+        <Box component={GridCol} span={12}>
           <Form onSubmit={form.onSubmit(AddRow)}>
-            <Title className={athitiTitle.className} size="h3">
-              เพิ่มรายการที่ต้องการยืมอุปกรณ์ IT 
+            <Title className={athitiTitle.className} size="h3" align="center" mb="lg">
+              เพิ่มรายการที่ต้องการยืมอุปกรณ์ IT
             </Title>
-            <Grid h={`80%`} py={20}>
+            <Grid py={20}>
               {renderInputList}
               {renderComputerFields}
             </Grid>
-            <br />
-            <a 
-              href="https://docs.google.com/spreadsheets/d/1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk/edit" 
-              target="_blank"
-            >
-              รายการข้อมูล โปรด Click !!
-            </a>
-            <Button
-              className={`btn ${!valid ? "hidden" : ""}`}
-              type="submit"
-              mt="lg"
-              w={"50%"}
-              variant="gradient"
-              loading={loading}
-              gradient={{ from: "#3f9c85", to: "#1d566a", deg: 100 }}
-              disabled={!valid}
-            >
-              Submit
-            </Button>
+            <Box mt="md" align="center">
+              <a
+                href="https://docs.google.com/spreadsheets/d/1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk/edit"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                รายการข้อมูล โปรด Click !!
+              </a>
+            </Box>
+            <Box mt="lg" align="center">
+              <Button
+                type="submit"
+                variant="gradient"
+                loading={loading}
+                gradient={{ from: "#3f9c85", to: "#1d566a", deg: 100 }}
+                disabled={!valid}
+              >
+                Submit
+              </Button>
+            </Box>
           </Form>
         </Box>
       </FormProvider>
@@ -383,10 +329,6 @@ function ContactUs() {
   );
 }
 
-export const getStaticProps = async () => {
-  return {
-    props: {},
-  };
-};
+export const getStaticProps = async () => ({ props: {} });
 
 export default ContactUs;
