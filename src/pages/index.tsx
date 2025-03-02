@@ -19,7 +19,7 @@ const athitiTitle = Athiti({
   subsets: ["latin"],
 });
 
-const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
+const API = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
 // ===========================================
 //  ประกาศโครงสร้างข้อมูลในฟอร์ม
@@ -204,7 +204,8 @@ export default function LoanRequestForm() {
       // -------------------------------------
       if (values.computers && values.computers.length > 0) {
         const computersErrors = values.computers.map((comp, index) => {
-          const itemErrors: { computer_name?: string; asset_number?: string } = {};
+          const itemErrors: { computer_name?: string; asset_number?: string } =
+            {};
 
           if (!comp.computer_name.trim()) {
             itemErrors.computer_name = "โปรดระบุ Computer Name ให้ครบถ้วน";
@@ -257,7 +258,9 @@ export default function LoanRequestForm() {
     const endDateTime = dayjs(values.end_date_time).add(543, "year");
     const currentDateTime = dayjs().add(543, "year");
 
-    const formattedStartDate = startDateTime.format("D MMMM YYYY เวลา HH:mm น.");
+    const formattedStartDate = startDateTime.format(
+      "D MMMM YYYY เวลา HH:mm น."
+    );
     const formattedEndDate = endDateTime.format("D MMMM YYYY เวลา HH:mm น.");
     const formattedCurrentDate = currentDateTime.format("D MMMM YYYY");
     const formattedCurrentTime = currentDateTime.format("HH:mm");
@@ -399,8 +402,7 @@ export default function LoanRequestForm() {
         <NumberInput
           label={
             <>
-              Unit (จำนวน) *{" "}
-              <span className="text-red-600">(สูงสุด 5)</span>
+              Unit (จำนวน) * <span className="text-red-600">(สูงสุด 5)</span>
             </>
           }
           placeholder="จำนวน"
@@ -452,8 +454,14 @@ export default function LoanRequestForm() {
   //  ส่วนแสดงผลฟิลด์ computers (dynamic)
   // =========================================
   const renderComputers = form.values.computers.map((item, index) => (
-    <div key={`computer-${index}`} className="col-span-12 bg-gray-50 p-4 rounded-md">
-      <div className="font-semibold mb-2">รายการคอมพิวเตอร์ที่ #{index + 1} <i className="text-red-500">ไม่มีเลขครุภัณฑ์ ใส่ 0000</i></div>
+    <div
+      key={`computer-${index}`}
+      className="col-span-12 bg-gray-50 p-4 rounded-md"
+    >
+      <div className="font-semibold mb-2">
+        รายการคอมพิวเตอร์ที่ #{index + 1}{" "}
+        <i className="text-red-500">ไม่มีเลขครุภัณฑ์ ใส่ 0000</i>
+      </div>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <TextInput
@@ -510,7 +518,9 @@ export default function LoanRequestForm() {
                 type="submit"
                 className={`px-6 py-2 rounded-md text-white font-medium ${
                   !hasChanged ? "hidden" : ""
-                } ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600"}`}
+                } ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600"
+                }`}
                 disabled={!hasChanged || loading}
               >
                 {loading ? "Submitting..." : "Submit"}
