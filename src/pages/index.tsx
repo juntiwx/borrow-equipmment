@@ -2,23 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm, FormErrors } from "@mantine/form";
 import { NumberInput, TextInput, NativeSelect } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-<<<<<<< HEAD
-import { InputPayload } from "../types";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import _ from "lodash";
-import { useEffect, useMemo, useState } from "react";
-import { notifications } from "@mantine/notifications";
-import { Athiti } from "next/font/google";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import Link from "next/link";
-import Head from "next/head";
-=======
 import { notifications } from "@mantine/notifications";
 import { Athiti } from "next/font/google";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
->>>>>>> function_asset_numbet
 
 // Google font
 const athiti = Athiti({
@@ -32,17 +19,7 @@ const athitiTitle = Athiti({
   subsets: ["latin"],
 });
 
-<<<<<<< HEAD
-const FormProvider = styled(Grid)`
-  padding: 30px 40px;
-  border-radius: 16px;
-  .mantine-Grid-inner {
-    height: 100%;
-  }
-`;
-=======
-const API = process.env.NEXT_PUBLIC_API_ENTPOINT;
->>>>>>> function_asset_numbet
+const API = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
 // ===========================================
 //  ประกาศโครงสร้างข้อมูลในฟอร์ม
@@ -67,166 +44,10 @@ interface FormValues {
   computers: ComputerItem[];
 }
 
-<<<<<<< HEAD
-const inputItems: InputPayload = {
-  employee_id: {
-    name: "Employee ID (รหัสพนักงาน) *",
-    component: TextInput,
-  },
-  full_name: {
-    name: "Full name (ชื่อ สกุล) *",
-    component: TextInput,
-  },
-  position: {
-    name: "Position (ตำแหน่ง) *",
-    component: TextInput,
-  },
-  department: {
-    name: "Section (หน่วยงาน) *",
-    component: Select,
-    options: [
-      "เลือกตัวเลือก",
-      "แผนกบริการวิชาการ",
-      "แผนกสนับสนุนงานบริการ",
-      "กลุ่มกลยุทธ์และพัฒนาวิชาการ",
-      "กลุ่มงานอาคารอทิตยาทร",
-      "กลุ่มบริการวิชาการ",
-      "กลุ่มบัณฑิตศึกษา",
-      "กลุ่มศิษย์เก่าสัมพันธ์และแนะแนวอาชีพ",
-      "กลุ่มสาขาวิชาการจัดการการท่องเที่ยวและการบริการ",
-      "กลุ่มสาขาวิชาจิตรกรรมและศิลปกรรม",
-      "กลุ่มสาขาวิชาบริหารธุรกิจ",
-      "กลุ่มสาขาวิชามนุษยศาสตร์และภาษาต่างประเทศ",
-      "กลุ่มสาขาวิชาวิทยาศาสตร์",
-      "กลุ่มสาขาวิชาสังคมศาสตร์",
-      "คณะผู้บริหาร",
-      "งานเทคโนโลยีการศึกษา",
-      "งานเทคโนโลยีสารสนเทศ",
-      "งานแผนและพัฒนาคุณภาพ",
-      "งานการเงินและบัญชี",
-      "งานการต่างประเทศ",
-      "งานกิจการนักศึกษา",
-      "งานทรัพยากรบุคคล",
-      "งานบริหารกลาง",
-      "งานบริหารการศึกษา",
-      "งานปฏิบัติการและสิ่งแวดล้อม",
-      "งานพัสดุ",
-      "งานรับสมัครและทะเบียนนักศึกษา",
-      "งานส่งเสริมและบริหารการวิจัย",
-      "งานสื่อสารองค์กร",
-      "งานห้องสมุด",
-      "ฝ่ายการคลังและทรัพยากรบุคคล",
-      "ฝ่ายการวางแผนกลยุทธ์และพัฒนาคุณภาพ",
-      "ฝ่ายการศึกษา",
-      "ฝ่ายกิจการนักศึกษา",
-      "ฝ่ายวิเทศสัมพันธ์",
-      "ฝ่ายวิจัยและการบริการวิชาการ",
-      "ฝ่ายสำนักงานคณบดี",
-      "ฝ่ายสิ่งแวดล้อมและการพัฒนาอย่างยั่งยืน",
-      "ฝ่ายสื่อสารองค์กรและสารสนเทศ",
-      "ศูนย์เตรียมความพร้อมภาษาและคณิตศาสตร์",
-      "ศูนย์ปฏิบัติการโรงแรมศาลายาพาวิลเลียน",
-      "สำนักงานคณบดี",
-      "หน่วยเลขานุการ",
-      "หน่วยแนะแนวอาชีพ",
-      "หน่วยแผนติดตามและประเมินผล",
-      "หน่วยแลกเปลี่ยนนักศึกษา",
-      "หน่วยกลยุทธ์วิชาการ",
-      "หน่วยการเงิน",
-      "หน่วยการจัดการทรัพยากรบุคคล",
-      "หน่วยการตลาด",
-      "หน่วยคลังพัสดุ",
-      "หน่วยจัดหาพัสดุ",
-      "หน่วยซ่อมบำรุง",
-      "หน่วยทะเบียนและประเมินผล",
-      "หน่วยที่ปรึกษาทางวิชาการ",
-      "หน่วยธุรการ",
-      "หน่วยบริการเทคโนโลยีการศึกษา",
-      "หน่วยบริการและปฏิบัติการคอมพิวเตอร์",
-      "หน่วยบริการและสวัสดิการนักศึกษา",
-      "หน่วยบริการห้องสมุด (อาคารอทิตยาทร)",
-      "หน่วยบริการห้องสมุด 1  (MUIC อาคาร 1)",
-      "หน่วยบริหารงบประมาณ",
-      "หน่วยบริหารจัดการทรัพยากรสารสนเทศห้องสมุด ",
-      "หน่วยบริหารจัดการอาคาร",
-      "หน่วยบริหารจัดการอาคารและความปลอดภัย",
-      "หน่วยบริหารหลักสูตร",
-      "หน่วยบัญชี",
-      "หน่วยบ้านพักนักศึกษา",
-      "หน่วยประเมินผลการวิจัย",
-      "หน่วยฝึกอบรม",
-      "หน่วยพัฒนาเครือข่ายโครงการที่ปรึกษา",
-      "หน่วยพัฒนาและผลิตสื่อ",
-      "หน่วยพัฒนาโครงการเพื่อสร้างความร่วมมือ",
-      "หน่วยพัฒนาการจัดอันดับมหาวิทยาลัย",
-      "หน่วยพัฒนาความก้าวหน้าทางวิชาชีพ",
-      "หน่วยพัฒนาคุณภาพ",
-      "หน่วยพัฒนาทรัพยากรบุคคล",
-      "หน่วยพัฒนานักศึกษา",
-      "หน่วยพันธกิจสัมพันธ์เพื่อสังคม",
-      "หน่วยระบบคอมพิวเตอร์เครื่องแม่ข่าย",
-      "หน่วยรับสมัครและจัดสอบ",
-      "หน่วยวิเคราะห์และพัฒนาระบบ",
-      "หน่วยวิเทศสัมพันธ์และเครือข่ายต่างประเทศ",
-      "หน่วยวิศวกรรมและระบบอาคาร",
-      "หน่วยวิศวกรรมและสาธารณูปโภค",
-      "หน่วยศิษย์เก่าสัมพันธ์",
-      "หน่วยส่งเสริมการวิจัย",
-      "หน่วยสนับสนุนกลุ่มสาขาวิชา",
-      "หน่วยสนับสนุนบริการบัณฑิตศึกษา",
-      "หน่วยสนับสนุนวิชาการบัณฑิตศึกษา",
-      "หน่วยสนับสนุนอาจารย์",
-      "หน่วยสวัสดิการและสิทธิประโยชน์",
-      "หน่วยสิ่งแวดล้อมและการบริการทั่วไป",
-      "หน่วยสื่อทางการศึกษา",
-      "หน่วยสื่อสารองค์กร",
-      "หน่วยห้องปฏิบัติการวิทยาศาสตร์",
-    ],
-  },
-  tel: {
-    name: "Tel (เบอร์ติดต่อ) *",
-    component: TextInput,
-  },
-  equipment: {
-    name: "Equipment (อุปกรณ์ที่ต้องการยืม) *",
-    component: Select,
-    options: ["เลือกตัวเลือก", "Notebook", "External"],
-  },
-  number: {
-    name: "Unit (จำนวน) *",
-    component: NumberInput,
-  },
-  purpose: {
-    name: "Purpose (วัตถุประสงค์การใช้งาน) *",
-    component: TextInput,
-  },
-  start_date_time: {
-    name: "Date time start (วันเวลา เริ่มใช้งาน) *",
-    component: DateTimePicker,
-  },
-  end_date_time: {
-    name: "Date time end (วันเวลา สิ้นสุดใช้งาน) *",
-    component: DateTimePicker,
-  },
-  location: {
-    name: "Location (สถานที่ใช้งาน) *",
-    component: TextInput,
-  },
-};
-
-const Checkcondition = (condition: boolean, ans: string): string | null => {
-  return condition ? ans : null;
-};
-
-// For call get rows
-// const fetchData = async () => await (await fetch(`${API}`)).json();
-const init = {
-=======
 // ===========================================
 //  ค่าเริ่มต้นในฟอร์ม
 // ===========================================
 const initialFormValues: FormValues = {
->>>>>>> function_asset_numbet
   employee_id: "",
   full_name: "",
   position: "",
@@ -241,20 +62,12 @@ const initialFormValues: FormValues = {
   computers: [],
 };
 
-<<<<<<< HEAD
-function ContactUs() {
-  const supabaseClient = useSupabaseClient();
-
-  const form = useForm({
-    initialValues: init,
-=======
 // ===========================================
 //  ฟังก์ชันตรวจสอบว่า form เปลี่ยนจากค่าเริ่มต้นหรือยัง
 // ===========================================
 const isFormChanged = (initial: FormValues, current: FormValues): boolean => {
   return JSON.stringify(initial) !== JSON.stringify(current);
 };
->>>>>>> function_asset_numbet
 
 export default function LoanRequestForm() {
   const [departmentOptions, setDepartmentOptions] = useState(["เลือกตัวเลือก"]);
@@ -391,7 +204,8 @@ export default function LoanRequestForm() {
       // -------------------------------------
       if (values.computers && values.computers.length > 0) {
         const computersErrors = values.computers.map((comp, index) => {
-          const itemErrors: { computer_name?: string; asset_number?: string } = {};
+          const itemErrors: { computer_name?: string; asset_number?: string } =
+            {};
 
           if (!comp.computer_name.trim()) {
             itemErrors.computer_name = "โปรดระบุ Computer Name ให้ครบถ้วน";
@@ -444,7 +258,9 @@ export default function LoanRequestForm() {
     const endDateTime = dayjs(values.end_date_time).add(543, "year");
     const currentDateTime = dayjs().add(543, "year");
 
-    const formattedStartDate = startDateTime.format("D MMMM YYYY เวลา HH:mm น.");
+    const formattedStartDate = startDateTime.format(
+      "D MMMM YYYY เวลา HH:mm น."
+    );
     const formattedEndDate = endDateTime.format("D MMMM YYYY เวลา HH:mm น.");
     const formattedCurrentDate = currentDateTime.format("D MMMM YYYY");
     const formattedCurrentTime = currentDateTime.format("HH:mm");
@@ -477,28 +293,18 @@ export default function LoanRequestForm() {
     }
 
     try {
-<<<<<<< HEAD
-      await supabaseClient.from("borrow").insert(payload);
-=======
       await fetch(`${API}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(rowData),
       });
->>>>>>> function_asset_numbet
 
       notifications.show({
         title: "แจ้งผลดำเนินการ",
         message: "ขอคำร้องสำเร็จ",
         color: "teal",
       });
-<<<<<<< HEAD
-
       form.reset();
-      setLoading(false);
-=======
-      form.reset();
->>>>>>> function_asset_numbet
     } catch (error) {
       console.error(error);
       notifications.show({
@@ -596,8 +402,7 @@ export default function LoanRequestForm() {
         <NumberInput
           label={
             <>
-              Unit (จำนวน) *{" "}
-              <span className="text-red-600">(สูงสุด 5)</span>
+              Unit (จำนวน) * <span className="text-red-600">(สูงสุด 5)</span>
             </>
           }
           placeholder="จำนวน"
@@ -649,8 +454,14 @@ export default function LoanRequestForm() {
   //  ส่วนแสดงผลฟิลด์ computers (dynamic)
   // =========================================
   const renderComputers = form.values.computers.map((item, index) => (
-    <div key={`computer-${index}`} className="col-span-12 bg-gray-50 p-4 rounded-md">
-      <div className="font-semibold mb-2">รายการคอมพิวเตอร์ที่ #{index + 1} <i className="text-red-500">ไม่มีเลขครุภัณฑ์ ใส่ 0000</i></div>
+    <div
+      key={`computer-${index}`}
+      className="col-span-12 bg-gray-50 p-4 rounded-md"
+    >
+      <div className="font-semibold mb-2">
+        รายการคอมพิวเตอร์ที่ #{index + 1}{" "}
+        <i className="text-red-500">ไม่มีเลขครุภัณฑ์ ใส่ 0000</i>
+      </div>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <TextInput
@@ -673,58 +484,6 @@ export default function LoanRequestForm() {
   ));
 
   return (
-<<<<<<< HEAD
-    <>
-      <Head>
-        <title>แบบฟอร์มกรอกข้อมูลขอใช้งานอุปกรณ์ IT</title>
-      </Head>
-      <Container
-        className={athiti.className}
-        fluid
-        h={`100vh`}
-        w={`100%`}
-        bg="#ececc6"
-        p={50}
-      >
-        <FormProvider h={`100%`} w={`100%`} bg="#ffffff">
-          <Box component={GridCol} span={6}>
-            <Center h={`100%`}>
-              <Image radius="lg" src={"/logo.png"} w={"90%"} />
-            </Center>
-          </Box>
-          <Box component={GridCol} span={6} h={`100%`} display={"flex"}>
-            <Form onSubmit={form.onSubmit(AddRow)}>
-              <Title className={athitiTitle.className} size="h3">
-                เพิ่มรายการที่ต้องการยืมอุปกรณ์ IT
-              </Title>
-              <Grid h={`80%`} py={20}>
-                {renderInputList}
-              </Grid>
-
-              <br />
-              <Link href="/borrow-list">รายการข้อมูล โปรด Click !!</Link>
-              <Button
-                className={`btn ${!valid ? "hidden" : ""}`}
-                type="submit"
-                mt="lg"
-                w={"50%"}
-                variant="gradient"
-                loading={loading}
-                gradient={{ from: "#3f9c85", to: "#1d566a", deg: 100 }}
-                disabled={!valid}
-              >
-                Submit
-              </Button>
-            </Form>
-          </Box>
-        </FormProvider>
-      </Container>
-    </>
-  );
-}
-
-export default ContactUs;
-=======
     <div className={`min-h-screen bg-[#ececc6] p-10 ${athiti.className}`}>
       <div className="max-w-5xl mx-auto">
         <div className="bg-white rounded-md md:rounded-lg shadow-none md:shadow-lg overflow-y-auto md:max-h-[90vh] p-5 md:py-8 md:px-10">
@@ -759,7 +518,9 @@ export default ContactUs;
                 type="submit"
                 className={`px-6 py-2 rounded-md text-white font-medium ${
                   !hasChanged ? "hidden" : ""
-                } ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600"}`}
+                } ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600"
+                }`}
                 disabled={!hasChanged || loading}
               >
                 {loading ? "Submitting..." : "Submit"}
@@ -771,4 +532,3 @@ export default ContactUs;
     </div>
   );
 }
->>>>>>> function_asset_numbet
