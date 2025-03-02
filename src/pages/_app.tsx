@@ -2,7 +2,7 @@
 // All packages except `@mantine/hooks` require styles imports
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
-import "@App/styles/globals.css";
+import "@App/app/globals.css";
 import "@mantine/notifications/styles.css";
 
 import type { AppProps } from "next/app";
