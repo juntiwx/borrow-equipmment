@@ -1,13 +1,14 @@
-import {
-  MantineComponent,
-  TextInputProps,
-  __InputStylesNames,
-} from "@mantine/core";
+import { MantineComponent, TextInputProps, __InputStylesNames } from "@mantine/core";
 
 type InputType = {
   name: string;
   component: any;
   options?: string[];
+};
+
+export type Computer = {
+  computer_name: string;
+  asset_number: string;
 };
 
 export type ItemListType = {
@@ -22,8 +23,11 @@ export type ItemListType = {
   location: string;
   start_date_time: string;
   end_date_time: string;
+  computers: Computer[];
 };
 
 export type InputPayload = {
-  [k in keyof ItemListType]: InputType;
+  [k in keyof Omit<ItemListType, "computers">]: InputType;
+} & {
+  computers: InputType[];
 };
