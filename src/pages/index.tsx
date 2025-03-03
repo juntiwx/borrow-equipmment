@@ -32,17 +32,32 @@ interface FormValues
 }
 
 // ค่าเริ่มต้นในฟอร์ม
+// const initialFormValues: FormValues = {
+//   employee_id: "13000852",
+//   full_name: "จันทิมา นุชโยธิน",
+//   position: "นักวิชาการคอมพิวเตอร์",
+//   department: "งานเทคโนโลยีสารสนเทศ",
+//   tel: "4203",
+//   equipment: "Notebook",
+//   purpose: "ทดสอบระบบ",
+//   start_date_time: null,
+//   end_date_time: null,
+//   location: "ทดสอบระบบ",
+//   number: 0,
+//   computers: [],
+// };
+
 const initialFormValues: FormValues = {
-  employee_id: "13000852",
-  full_name: "จันทิมา นุชโยธิน",
-  position: "นักวิชาการคอมพิวเตอร์",
-  department: "งานเทคโนโลยีสารสนเทศ",
-  tel: "4203",
-  equipment: "Notebook",
-  purpose: "ทดสอบระบบ",
+  employee_id: "",
+  full_name: "",
+  position: "",
+  department: "",
+  tel: "",
+  equipment: "",
+  purpose: "",
   start_date_time: null,
   end_date_time: null,
-  location: "ทดสอบระบบ",
+  location: "",
   number: 0,
   computers: [],
 };
@@ -459,7 +474,7 @@ export default function LoanRequestForm() {
 
             <div className="mt-4 text-center">
               <a
-                href="https://docs.google.com/spreadsheets/d/1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk/edit"
+                href="https://docs.google.com/spreadsheets/d/1fAFzSLBIZBtfKQLFszLTLRzCmEfPxE7MVzHK1s_8PU4/edit"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline"
