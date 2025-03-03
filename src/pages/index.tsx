@@ -19,8 +19,9 @@ const athitiTitle = Athiti({
   subsets: ["latin"],
 });
 
+// ชี้ไปที่ API ของ Google Apps Script
 const API = process.env.NEXT_PUBLIC_API_ENDPOINT;
-z
+
 // ===========================================
 //  ประกาศโครงสร้างข้อมูลในฟอร์ม
 // ===========================================
@@ -237,6 +238,7 @@ export default function LoanRequestForm() {
     const endDateTime = dayjs(values.end_date_time).add(543, "year");
     const currentDateTime = dayjs().add(543, "year");
 
+    // รูปแบบเดียวกัน: "D MMMM YYYY เวลา HH:mm น."
     const formattedStartDate = startDateTime.format(
       "D MMMM YYYY เวลา HH:mm น."
     );
