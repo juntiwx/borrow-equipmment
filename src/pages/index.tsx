@@ -20,7 +20,7 @@ const athitiTitle = Athiti({
 });
 
 const API = process.env.NEXT_PUBLIC_API_ENDPOINT;
-
+z
 // ===========================================
 //  ประกาศโครงสร้างข้อมูลในฟอร์ม
 // ===========================================
@@ -48,16 +48,16 @@ interface FormValues {
 //  ค่าเริ่มต้นในฟอร์ม
 // ===========================================
 const initialFormValues: FormValues = {
-  employee_id: "",
-  full_name: "",
-  position: "",
-  department: "",
-  tel: "",
-  equipment: "",
-  purpose: "",
+  employee_id: "13000852",
+  full_name: "จันทิมา นุชโยธิน",
+  position: "นักวิชาการคอมพิวเตอร์",
+  department: "งานเทคโนโลยีสารสนเทศ",
+  tel: "4203",
+  equipment: "Notebook",
+  purpose: "ทดสอบระบบ",
   start_date_time: null,
   end_date_time: null,
-  location: "",
+  location: "ทดสอบระบบ",
   number: 0,
   computers: [],
 };
@@ -117,72 +117,52 @@ export default function LoanRequestForm() {
     validate: (values) => {
       const errors: FormErrors<FormValues> = {};
 
-      // -------------------------------------
-      // Validate: employee_id
-      // -------------------------------------
+      // Validate: employee_id (ตัวอย่าง: 8 หลัก)
       if (!/^\d{8}$/.test(values.employee_id)) {
         errors.employee_id = "โปรดระบุรหัสพนักงาน 8 หลัก";
       }
 
-      // -------------------------------------
       // Validate: full_name
-      // -------------------------------------
       if (values.full_name.trim().length < 3) {
         errors.full_name = "โปรดระบุชื่อ-สกุลให้ถูกต้อง (อย่างน้อย 3 ตัวอักษร)";
       }
 
-      // -------------------------------------
       // Validate: position
-      // -------------------------------------
       if (values.position.trim().length < 3) {
         errors.position = "โปรดระบุตำแหน่งให้ถูกต้อง (อย่างน้อย 3 ตัวอักษร)";
       }
 
-      // -------------------------------------
       // Validate: department
-      // -------------------------------------
       if (values.department.trim().length < 3) {
         errors.department = "โปรดระบุหน่วยงานให้ถูกต้อง";
       }
 
-      // -------------------------------------
       // Validate: tel (4-10 หลักตัวเลข)
-      // -------------------------------------
       if (!/^\d{4,10}$/.test(values.tel)) {
         errors.tel = "โปรดระบุเบอร์โทร 4-10 หลัก";
       }
 
-      // -------------------------------------
       // Validate: equipment
-      // -------------------------------------
       if (values.equipment.trim().length < 3) {
         errors.equipment = "โปรดระบุอุปกรณ์ให้ถูกต้อง";
       }
 
-      // -------------------------------------
       // Validate: number (1-5)
-      // -------------------------------------
       if (values.number < 1 || values.number > 5) {
         errors.number = "โปรดระบุจำนวน 1-5 เท่านั้น";
       }
 
-      // -------------------------------------
       // Validate: purpose
-      // -------------------------------------
       if (values.purpose.trim().length < 3) {
         errors.purpose = "โปรดระบุเหตุผลในการยืมอย่างน้อย 3 ตัวอักษร";
       }
 
-      // -------------------------------------
       // Validate: location
-      // -------------------------------------
       if (values.location.trim().length < 3) {
         errors.location = "โปรดระบุสถานที่ใช้งานอย่างน้อย 3 ตัวอักษร";
       }
 
-      // -------------------------------------
       // Validate: start_date_time < end_date_time
-      // -------------------------------------
       if (!values.start_date_time) {
         errors.start_date_time = "โปรดระบุวันเวลาเริ่มใช้งาน";
       }
@@ -199,9 +179,7 @@ export default function LoanRequestForm() {
         }
       }
 
-      // -------------------------------------
       // Validate: computers (dynamic array)
-      // -------------------------------------
       if (values.computers && values.computers.length > 0) {
         const computersErrors = values.computers.map((comp, index) => {
           const itemErrors: { computer_name?: string; asset_number?: string } =
@@ -220,6 +198,7 @@ export default function LoanRequestForm() {
           return Object.keys(itemErrors).length > 0 ? itemErrors : null;
         });
 
+        // รวม error ของแต่ละ item ใน array
         if (computersErrors.some((item) => item !== null)) {
           errors.computers = computersErrors as any;
         }
@@ -253,7 +232,7 @@ export default function LoanRequestForm() {
     setLoading(true);
     dayjs.locale("th");
 
-    // ปรับปีให้เป็น พ.ศ. เฉพาะส่วนที่แสดงผล
+    // ปรับปีให้เป็น พ.ศ.
     const startDateTime = dayjs(values.start_date_time).add(543, "year");
     const endDateTime = dayjs(values.end_date_time).add(543, "year");
     const currentDateTime = dayjs().add(543, "year");
@@ -262,26 +241,29 @@ export default function LoanRequestForm() {
       "D MMMM YYYY เวลา HH:mm น."
     );
     const formattedEndDate = endDateTime.format("D MMMM YYYY เวลา HH:mm น.");
-    const formattedCurrentDate = currentDateTime.format("D MMMM YYYY");
+    const formattedCurrentDate = currentDateTime.format(
+      "D MMMM YYYY เวลา HH:mm น."
+    );
     const formattedCurrentTime = currentDateTime.format("HH:mm");
 
+    // เรียงตามคอลัมน์ใน Google Sheet (index 0..23)
     const rowData = [
-      values.employee_id,
-      values.full_name,
-      values.position,
-      values.department,
-      values.tel,
-      values.equipment,
-      values.purpose,
-      values.location,
-      values.number,
-      formattedStartDate,
-      formattedEndDate,
-      formattedCurrentDate,
-      formattedCurrentTime,
+      values.employee_id, // 0
+      values.full_name, // 1
+      values.position, // 2
+      values.department, // 3
+      values.tel, // 4
+      values.equipment, // 5
+      values.purpose, // 6
+      values.location, // 7
+      values.number, // 8
+      formattedStartDate, // 9
+      formattedEndDate, // 10
+      formattedCurrentDate, // 11 (date_request)
+      formattedCurrentTime, // 12 (time_request)
     ];
 
-    // เพิ่มข้อมูลคอมพิวเตอร์
+    // เพิ่มข้อมูลคอมพิวเตอร์ 5 ชุด (computer_name + asset_number)
     for (let i = 0; i < 5; i++) {
       if (values.computers[i]) {
         rowData.push(values.computers[i].computer_name || "");
@@ -292,10 +274,18 @@ export default function LoanRequestForm() {
       }
     }
 
+    // สุดท้าย (24) ไว้เป็น doc_url (เริ่มต้นเป็นค่าว่าง)
+    // ถ้าไม่ต้องการเก็บลิงก์ doc_url ก็ไม่ต้องเติมอะไรก็ได้
+    rowData.push("");
+
     try {
+      // ส่งข้อมูลไปยัง Google Apps Script
       await fetch(`${API}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        mode: "no-cors",
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(rowData),
       });
 
@@ -385,7 +375,6 @@ export default function LoanRequestForm() {
         ปรับ 3 ฟิลด์ Equipment, Unit, Purpose ให้อยู่ “แถวเดียวกัน” 
         โดยรวมกันให้ได้ 12 columns
       */}
-
       {/* Equipment => col-span-4 */}
       <div className="col-span-12 md:col-span-3">
         <NativeSelect
@@ -397,7 +386,7 @@ export default function LoanRequestForm() {
         />
       </div>
 
-      {/* Unit => col-span-2 */}
+      {/* Unit => col-span-3 */}
       <div className="col-span-12 md:col-span-3">
         <NumberInput
           label={
@@ -422,6 +411,7 @@ export default function LoanRequestForm() {
         />
       </div>
 
+      {/* DateTime Start */}
       <div className="col-span-12 md:col-span-6">
         <DateTimePicker
           label="Date time start (วันเวลา เริ่มใช้งาน) *"
@@ -430,6 +420,8 @@ export default function LoanRequestForm() {
           error={form.errors.start_date_time}
         />
       </div>
+
+      {/* DateTime End */}
       <div className="col-span-12 md:col-span-6">
         <DateTimePicker
           label="Date time end (วันเวลา สิ้นสุดใช้งาน) *"
@@ -439,6 +431,7 @@ export default function LoanRequestForm() {
         />
       </div>
 
+      {/* Location */}
       <div className="col-span-12">
         <TextInput
           label="Location (สถานที่ใช้งาน) *"

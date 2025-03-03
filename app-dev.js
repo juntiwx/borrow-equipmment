@@ -1,144 +1,178 @@
+// -------------------------
+// ปรับค่าได้ตามต้องการ
+// -------------------------
 const SheetID = "1fAFzSLBIZBtfKQLFszLTLRzCmEfPxE7MVzHK1s_8PU4";
 
-// กำหนด Header สำหรับฟิลด์พื้นฐาน ตามลำดับใหม่ (ไม่รวม dynamic field computers)
-const baseHeaders = [
-  "employee_id",
-  "full_name",
-  "template", // สำหรับ placeholder ใน template Google Doc
-  "position",
-  "department",
-  "tel",
-  "equipment",
-  "number",
-  "purpose",
-  "location",
-  "start_date_time",
-  "end_date_time",
-  "date_request",
-  "time_request"
-];
+// headerList ใช้กรณีอ่านข้อมูล doGet (เป็น Option ไม่ใส่ก็ได้)
+const headerList = {
+  "employee_id": true,
+  "full_name": true,
+  "position": true,
+  "department": true,
+  "tel": true,
+  "equipment": true,
+  "purpose": true,
+  "location": true,
+  "number": true,
+  "start_date_time": true,
+  "end_date_time": true,
+  "date_request": true,
+  "time_request": true,
+  "computer_name_1": true,
+  "asset_number_1": true,
+  "computer_name_2": true,
+  "asset_number_2": true,
+  "computer_name_3": true,
+  "asset_number_3": true,
+  "computer_name_4": true,
+  "asset_number_4": true,
+  "computer_name_5": true,
+  "asset_number_5": true,
+  // doc_url จะใส่หรือไม่ใส่ก็ได้
+};
 
-// เปลี่ยนเป็นรองรับ dynamic fields สำหรับ computers 5 คู่
-// รองรับ 5 คู่: computer_name_1, asset_number_1, ... , computer_name_5, asset_number_5
-const maxComputers = 5;
-
-// Helper: อ่าน Sheet
+// -------------------------
+// Helper
+// -------------------------
 const getSheet = () => SpreadsheetApp.openById(SheetID).getActiveSheet();
 
-// Helper: ส่ง JSON response
 const responseJSON = (data) =>
-  ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+  ContentService.createTextOutput(JSON.stringify(data)).setMimeType(
+    ContentService.MimeType.JSON
+  );
 
-// ฟังก์ชัน map payload ให้เป็น Array ตามลำดับ column ที่กำหนด
-const mapPayloadToRow = (data) => {
-  let row = [];
-  // เติมข้อมูลฟิลด์พื้นฐานตาม baseHeaders (index 0 - 13)
-  baseHeaders.forEach((header) => {
-    row.push(data[header] || "");
-  });
-  
-  // เติมข้อมูล dynamic fields สำหรับ computers (computer_name และ asset_number)
-  const computers = Array.isArray(data.computers) ? data.computers : [];
-  for (let i = 0; i < maxComputers; i++) {
-    if (computers[i]) {
-      row.push(computers[i].computer_name || "");
-      row.push(computers[i].asset_number || "");
-    } else {
-      row.push("");
-      row.push("");
-    }
-  }
-  
-  // เพิ่ม column สำหรับ doc_url (หากยังไม่มีข้อมูล)
-  row.push("");
-  
-  return row;
-};
-
-// Controller: สร้าง record ใน Sheet
+// -------------------------
+// Controller
+// -------------------------
 const createRecord = (data) => {
   const sheet = getSheet();
-  const row = mapPayloadToRow(data);
-  sheet.appendRow(row);
+  // data คาดว่าจะยาว 24 ช่อง (หรือ 1 ช่อง doc_url + 24 ช่องอื่น ๆ)
+  sheet.appendRow(data);
 };
 
-// Controller: อ่านข้อมูลจาก Sheet
 const readRecords = () => {
   const sheet = getSheet();
-  const data = sheet.getDataRange().getValues();
-  const headers = data.shift();
+  const data = sheet.getDataRange().getValues(); // 2D array
+  const headers = data.shift(); // ดึงแถวแรกเป็น header
+
+  // สร้าง array ของ records
   return data.map((row) => {
-    let record = {};
+    const record = {};
     headers.forEach((header, i) => {
-      record[header] = row[i];
+      if (headerList[header]) {
+        record[header] = row[i];
+      }
     });
     return record;
   });
 };
 
+// -------------------------
 // GET Method
-function doGet(_) {
+// -------------------------
+function doGet(e) {
   const data = readRecords();
   return responseJSON(data);
 }
 
+// -------------------------
 // POST Method
+// -------------------------
 function doPost(e) {
-  try {
-    const data = JSON.parse(e.postData.contents);
-    createRecord(data);
-    return responseJSON({ success: true, data: data });
-  } catch (error) {
-    return responseJSON({ success: false, error: error.toString() });
-  }
+  // รับข้อมูลเป็น array
+  const data = JSON.parse(e.postData.contents);
+  createRecord(data);
+  return responseJSON({ success: true });
 }
 
-// Set custom menu บน Google Sheet
+// -------------------------
+// สร้างเมนูใน Google Sheet
+// -------------------------
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
-  const menu = ui.createMenu('Autofill google docs');
-  menu.addItem('Create new document', 'createNewGoogleDocs');
-  menu.addToUi();
+  ui.createMenu("Autofill google docs")
+    .addItem("Create new document", "createNewGoogleDocs")
+    .addToUi();
 }
 
+// -------------------------
+// สร้างเอกสารจาก Template
+// -------------------------
 function createNewGoogleDocs() {
-  // ใช้ Google Doc template ที่ต้องการ
-  const googleDocTemplate = DriveApp.getFileById('1gUSP9YVFf1Ag2Fn35zsrMy281R_gGwleEfA5jmjlig0');
-  const destinationFolder = DriveApp.getFolderById('1SarPOIi0EpQsCUNoHy5STpNL4O3IwkHL');
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
-  const rows = sheet.getDataRange().getValues();
+  // ไฟล์ Template และโฟลเดอร์ปลายทาง
+  const googleDocTemplate = DriveApp.getFileById("1gUSP9YVFf1Ag2Fn35zsrMy281R_gGwleEfA5jmjlig0");
+  const destinationFolder = DriveApp.getFolderById("1SarPOIi0EpQsCUNoHy5STpNL4O3IwkHL");
 
-  // สมมติว่า header อยู่ในแถวแรก
-  // จำนวน column ในแต่ละแถวจะเป็น: baseHeaders (14) + maxComputers * 2 (10) + doc_url (1) = 25
+  // ดึงข้อมูลจาก Sheet (รวม header)
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  const rows = sheet.getDataRange().getValues(); // แถวทั้งหมด
+
+  // rows[0] คือ header
+  // ดังนั้นเริ่ม loop จาก i=1 (ข้อมูลจริง)
   for (let i = 1; i < rows.length; i++) {
     const rowData = rows[i];
-    // ถ้า column doc_url (index 24) ว่าง ให้สร้างเอกสารใหม่
-    if (!rowData[24]) {
-      // สร้างชื่อเอกสาร โดยใช้ employee_id, full_name และ date_request
-      const docName = `${rowData[0]} ${rowData[1]} วันที่ร้องขอ ${rowData[12]}`;
-      const copy = googleDocTemplate.makeCopy(docName, destinationFolder);
+
+    // ตรวจคอลัมน์สุดท้าย (index 23) ว่าว่างหรือไม่ => ยังไม่เคยสร้าง Doc
+    if (rowData[23] === "") {
+      // สร้างไฟล์ copy จาก template
+      const copy = googleDocTemplate.makeCopy(
+        `${rowData[0]} ${rowData[1]} วันที่ร้องขอ ${rowData[11]}`, // ตัวอย่างชื่อไฟล์
+        destinationFolder
+      );
       const doc = DocumentApp.openById(copy.getId());
       const body = doc.getBody();
 
-      // แทนที่ placeholder สำหรับฟิลด์พื้นฐาน (index 0 - 13)
-      baseHeaders.forEach((header, index) => {
-        body.replaceText(`{{${header}}}`, rowData[index]);
-      });
-      
-      // แทนที่ placeholder สำหรับ dynamic fields (computers)
-      // placeholder: {{computer_name_1}}, {{asset_number_1}}, ... , {{computer_name_5}}, {{asset_number_5}}
-      for (let j = 0; j < maxComputers; j++) {
-        const compIndex = baseHeaders.length + j * 2; // เริ่มที่ index 14, 16, 18, 20, 22
-        const assetIndex = compIndex + 1;             // index 15, 17, 19, 21, 23
-        body.replaceText(`{{computer_name_${j + 1}}}`, rowData[compIndex]);
-        body.replaceText(`{{asset_number_${j + 1}}}`, rowData[assetIndex]);
-      }
+      // ------------------------------------
+      //  แทนที่ข้อความ placeholder
+      //  rowData[] index:
+      //    [0]=employee_id
+      //    [1]=full_name
+      //    [2]=position
+      //    [3]=department
+      //    [4]=tel
+      //    [5]=equipment
+      //    [6]=purpose
+      //    [7]=location
+      //    [8]=number
+      //    [9]=start_date_time
+      //    [10]=end_date_time
+      //    [11]=date_request
+      //    [12]=time_request
+      //    [13..22]=computer_name / asset_number
+      //    [23]=doc_url (ว่างตอนแรก)
+      // ------------------------------------
+      body.replaceText("{{employee_id}}", rowData[0]);
+      body.replaceText("{{full_name}}", rowData[1]);
+      body.replaceText("{{position}}", rowData[2]);
+      body.replaceText("{{department}}", rowData[3]);
+      body.replaceText("{{tel}}", rowData[4]);
+      body.replaceText("{{equipment}}", rowData[5]);
+      body.replaceText("{{purpose}}", rowData[6]);
+      body.replaceText("{{location}}", rowData[7]);
+      body.replaceText("{{number}}", rowData[8]);
+      body.replaceText("{{start_date_time}}", rowData[9]);
+      body.replaceText("{{end_date_time}}", rowData[10]);
+      body.replaceText("{{date_request}}", rowData[11]);
+      body.replaceText("{{time_request}}", rowData[12]);
 
+      // คอมพิวเตอร์ / Asset 1-5
+      body.replaceText("{{computer_name_1}}", rowData[13]);
+      body.replaceText("{{asset_number_1}}", rowData[14]);
+      body.replaceText("{{computer_name_2}}", rowData[15]);
+      body.replaceText("{{asset_number_2}}", rowData[16]);
+      body.replaceText("{{computer_name_3}}", rowData[17]);
+      body.replaceText("{{asset_number_3}}", rowData[18]);
+      body.replaceText("{{computer_name_4}}", rowData[19]);
+      body.replaceText("{{asset_number_4}}", rowData[20]);
+      body.replaceText("{{computer_name_5}}", rowData[21]);
+      body.replaceText("{{asset_number_5}}", rowData[22]);
+
+      // บันทึกเอกสาร
       doc.saveAndClose();
+
+      // นำ URL ของ doc มาใส่ใน column 24 (index 23)
       const url = doc.getUrl();
-      // บันทึก URL ลง column doc_url (คอลัมน์ที่ 3)
-      sheet.getRange(i + 1, 3).setValue(url);
+      sheet.getRange(i + 1, 24).setValue(url);
     }
   }
 }
