@@ -6,6 +6,7 @@ import { notifications } from "@mantine/notifications";
 import { Athiti } from "next/font/google";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
+import { Computer, ItemListType, InputPayload } from "../types"; // import types จาก type.ts
 
 // Google font
 const athiti = Athiti({
@@ -22,32 +23,15 @@ const athitiTitle = Athiti({
 // ชี้ไปที่ API ของ Google Apps Script
 const API = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
-// ===========================================
-//  ประกาศโครงสร้างข้อมูลในฟอร์ม
-// ===========================================
-interface ComputerItem {
-  computer_name: string;
-  asset_number: string;
-}
-
-interface FormValues {
-  employee_id: string;
-  full_name: string;
-  position: string;
-  department: string;
+// สร้าง interface สำหรับฟอร์ม โดยอิงจาก ItemListType แต่ปรับ field ที่ไม่ตรงกับค่า input
+interface FormValues
+  extends Omit<ItemListType, "tel" | "start_date_time" | "end_date_time"> {
   tel: string;
-  equipment: string;
-  purpose: string;
   start_date_time: Date | null;
   end_date_time: Date | null;
-  location: string;
-  number: number;
-  computers: ComputerItem[];
 }
 
-// ===========================================
-//  ค่าเริ่มต้นในฟอร์ม
-// ===========================================
+// ค่าเริ่มต้นในฟอร์ม
 const initialFormValues: FormValues = {
   employee_id: "13000852",
   full_name: "จันทิมา นุชโยธิน",
@@ -63,9 +47,7 @@ const initialFormValues: FormValues = {
   computers: [],
 };
 
-// ===========================================
-//  ฟังก์ชันตรวจสอบว่า form เปลี่ยนจากค่าเริ่มต้นหรือยัง
-// ===========================================
+// ฟังก์ชันตรวจสอบว่าฟอร์มมีการเปลี่ยนแปลงจากค่าเริ่มต้นหรือไม่
 const isFormChanged = (initial: FormValues, current: FormValues): boolean => {
   return JSON.stringify(initial) !== JSON.stringify(current);
 };
@@ -75,9 +57,7 @@ export default function LoanRequestForm() {
   const [equipmentOptions, setEquipmentOptions] = useState(["เลือกตัวเลือก"]);
   const [loading, setLoading] = useState(false);
 
-  // =========================================
-  //  ดึงข้อมูลตัวเลือกจาก Google Sheets
-  // =========================================
+  // ดึงข้อมูลตัวเลือกจาก Google Sheets
   useEffect(() => {
     const sheetId = "1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk";
     const sheetName = "select_option";
@@ -110,13 +90,11 @@ export default function LoanRequestForm() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  // =========================================
-  //  useForm + validate (custom function)
-  // =========================================
+  // สร้าง useForm พร้อมฟังก์ชัน validate แบบกำหนดเอง
   const form = useForm<FormValues>({
     initialValues: initialFormValues,
     validate: (values) => {
-      const errors: FormErrors<FormValues> = {};
+      const errors: FormErrors = {};
 
       // Validate: employee_id (ตัวอย่าง: 8 หลัก)
       if (!/^\d{8}$/.test(values.employee_id)) {
@@ -163,7 +141,7 @@ export default function LoanRequestForm() {
         errors.location = "โปรดระบุสถานที่ใช้งานอย่างน้อย 3 ตัวอักษร";
       }
 
-      // Validate: start_date_time < end_date_time
+      // Validate: start_date_time และ end_date_time
       if (!values.start_date_time) {
         errors.start_date_time = "โปรดระบุวันเวลาเริ่มใช้งาน";
       }
@@ -173,7 +151,6 @@ export default function LoanRequestForm() {
       if (values.start_date_time && values.end_date_time) {
         const start = dayjs(values.start_date_time);
         const end = dayjs(values.end_date_time);
-
         if (!start.isBefore(end)) {
           errors.start_date_time =
             "โปรดระบุวันเวลาเริ่มต้นการยืมให้ถูกต้อง (ต้องน้อยกว่าวันสิ้นสุด)";
@@ -185,21 +162,16 @@ export default function LoanRequestForm() {
         const computersErrors = values.computers.map((comp, index) => {
           const itemErrors: { computer_name?: string; asset_number?: string } =
             {};
-
           if (!comp.computer_name.trim()) {
             itemErrors.computer_name = "โปรดระบุ Computer Name ให้ครบถ้วน";
           }
-
           if (!comp.asset_number.trim()) {
             itemErrors.asset_number = "โปรดระบุ Asset Number ให้ครบถ้วน";
           } else if (!/^\d+$/.test(comp.asset_number)) {
             itemErrors.asset_number = "Asset Number ต้องเป็นตัวเลขเท่านั้น";
           }
-
           return Object.keys(itemErrors).length > 0 ? itemErrors : null;
         });
-
-        // รวม error ของแต่ละ item ใน array
         if (computersErrors.some((item) => item !== null)) {
           errors.computers = computersErrors as any;
         }
@@ -209,9 +181,7 @@ export default function LoanRequestForm() {
     },
   });
 
-  // =========================================
-  //  Effect: สร้างฟิลด์ computers ตาม number
-  // =========================================
+  // Effect: สร้างฟิลด์ computers ตามจำนวนที่ระบุ (สูงสุด 5)
   useEffect(() => {
     const count = Math.min(form.values.number, 5);
     let updatedComputers = [...(form.values.computers || [])];
@@ -224,21 +194,18 @@ export default function LoanRequestForm() {
       updatedComputers = updatedComputers.slice(0, count);
     }
     form.setFieldValue("computers", updatedComputers);
-  }, [form.values.number]);
+  }, [form, form.values.number]);
 
-  // =========================================
-  //  Handle Submit
-  // =========================================
+  // Handle Submit
   const handleSubmit = async (values: FormValues) => {
     setLoading(true);
     dayjs.locale("th");
 
-    // ปรับปีให้เป็น พ.ศ.
+    // ปรับวันที่ให้เป็น พ.ศ.
     const startDateTime = dayjs(values.start_date_time).add(543, "year");
     const endDateTime = dayjs(values.end_date_time).add(543, "year");
     const currentDateTime = dayjs().add(543, "year");
 
-    // รูปแบบเดียวกัน: "D MMMM YYYY เวลา HH:mm น."
     const formattedStartDate = startDateTime.format(
       "D MMMM YYYY เวลา HH:mm น."
     );
@@ -248,24 +215,23 @@ export default function LoanRequestForm() {
     );
     const formattedCurrentTime = currentDateTime.format("HH:mm");
 
-    // เรียงตามคอลัมน์ใน Google Sheet (index 0..23)
     const rowData = [
-      values.employee_id, // 0
-      values.full_name, // 1
-      values.position, // 2
-      values.department, // 3
-      values.tel, // 4
-      values.equipment, // 5
-      values.purpose, // 6
-      values.location, // 7
-      values.number, // 8
-      formattedStartDate, // 9
-      formattedEndDate, // 10
-      formattedCurrentDate, // 11 (date_request)
-      formattedCurrentTime, // 12 (time_request)
+      values.employee_id,
+      values.full_name,
+      values.position,
+      values.department,
+      values.tel,
+      values.equipment,
+      values.purpose,
+      values.location,
+      values.number,
+      formattedStartDate,
+      formattedEndDate,
+      formattedCurrentDate,
+      formattedCurrentTime,
     ];
 
-    // เพิ่มข้อมูลคอมพิวเตอร์ 5 ชุด (computer_name + asset_number)
+    // เพิ่มข้อมูล computers (computer_name + asset_number)
     for (let i = 0; i < 5; i++) {
       if (values.computers[i]) {
         rowData.push(values.computers[i].computer_name || "");
@@ -275,13 +241,10 @@ export default function LoanRequestForm() {
         rowData.push("");
       }
     }
-
-    // สุดท้าย (24) ไว้เป็น doc_url (เริ่มต้นเป็นค่าว่าง)
-    // ถ้าไม่ต้องการเก็บลิงก์ doc_url ก็ไม่ต้องเติมอะไรก็ได้
+    // ช่องสำหรับ doc_url (ถ้าไม่ต้องการเก็บค่าให้เว้นว่าง)
     rowData.push("");
 
     try {
-      // ส่งข้อมูลไปยัง Google Apps Script
       await fetch(`${API}`, {
         mode: "no-cors",
         method: "post",
@@ -309,17 +272,12 @@ export default function LoanRequestForm() {
     }
   };
 
-  // =========================================
-  //  เช็คว่าฟอร์มเปลี่ยนแปลงหรือยัง
-  // =========================================
   const hasChanged = useMemo(
     () => isFormChanged(initialFormValues, form.values),
     [form.values]
   );
 
-  // =========================================
-  //  ส่วนแสดงผล Input หลัก
-  // =========================================
+  // ส่วนแสดงผล Input หลัก
   const renderMainFields = (
     <>
       {/* Employee ID */}
@@ -373,11 +331,7 @@ export default function LoanRequestForm() {
         />
       </div>
 
-      {/* 
-        ปรับ 3 ฟิลด์ Equipment, Unit, Purpose ให้อยู่ “แถวเดียวกัน” 
-        โดยรวมกันให้ได้ 12 columns
-      */}
-      {/* Equipment => col-span-4 */}
+      {/* Equipment */}
       <div className="col-span-12 md:col-span-3">
         <NativeSelect
           label="Equipment (อุปกรณ์) *"
@@ -388,12 +342,12 @@ export default function LoanRequestForm() {
         />
       </div>
 
-      {/* Unit => col-span-3 */}
+      {/* Unit */}
       <div className="col-span-12 md:col-span-3">
         <NumberInput
           label={
             <>
-              Unit (จำนวน) * <span className="text-red-600">(สูงสุด 5)</span>
+              Unit (จำนวน) * <span className="text-red-500">(สูงสุด 5)</span>
             </>
           }
           placeholder="จำนวน"
@@ -403,7 +357,7 @@ export default function LoanRequestForm() {
         />
       </div>
 
-      {/* Purpose => col-span-6 */}
+      {/* Purpose */}
       <div className="col-span-12 md:col-span-6">
         <TextInput
           label="Purpose (วัตถุประสงค์การใช้งาน) *"
@@ -445,38 +399,44 @@ export default function LoanRequestForm() {
     </>
   );
 
-  // =========================================
-  //  ส่วนแสดงผลฟิลด์ computers (dynamic)
-  // =========================================
-  const renderComputers = form.values.computers.map((item, index) => (
-    <div
-      key={`computer-${index}`}
-      className="col-span-12 bg-gray-50 p-4 rounded-md"
-    >
-      <div className="font-semibold mb-2">
-        รายการคอมพิวเตอร์ที่ #{index + 1}{" "}
-        <i className="text-red-500">ไม่มีเลขครุภัณฑ์ ใส่ 0000</i>
-      </div>
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <TextInput
-            label="Computer Name (ชื่ออุปกรณ์)"
-            placeholder="Dell latitude 3400"
-            {...form.getInputProps(`computers.${index}.computer_name`)}
-            error={form.errors.computers?.[index]?.computer_name}
-          />
+  // ส่วนแสดงผลฟิลด์ computers (dynamic)
+  const renderComputers = form.values.computers.map((item, index) => {
+    // ระบุ type ของ error สำหรับ computers
+    type ComputerErrors = { computer_name?: string; asset_number?: string };
+    const errorsForComputer = form.errors.computers as
+      | ComputerErrors[]
+      | undefined;
+
+    return (
+      <div
+        key={`computer-${index}`}
+        className="col-span-12 bg-gray-50 p-4 rounded-md"
+      >
+        <div className="font-semibold mb-2">
+          รายการคอมพิวเตอร์ที่ #{index + 1}{" "}
+          <i className="text-red-500">ไม่มีเลขครุภัณฑ์ ใส่ 0000</i>
         </div>
-        <div className="flex-1">
-          <TextInput
-            label="Asset Number (เลขครุภัณฑ์)"
-            placeholder="41000008765"
-            {...form.getInputProps(`computers.${index}.asset_number`)}
-            error={form.errors.computers?.[index]?.asset_number}
-          />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <TextInput
+              label="Computer Name (ชื่ออุปกรณ์)"
+              placeholder="Dell latitude 3400"
+              {...form.getInputProps(`computers.${index}.computer_name`)}
+              error={errorsForComputer?.[index]?.computer_name}
+            />
+          </div>
+          <div className="flex-1">
+            <TextInput
+              label="Asset Number (เลขครุภัณฑ์)"
+              placeholder="41000008765"
+              {...form.getInputProps(`computers.${index}.asset_number`)}
+              error={errorsForComputer?.[index]?.asset_number}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  ));
+    );
+  });
 
   return (
     <div className={`min-h-screen bg-[#ececc6] p-10 ${athiti.className}`}>
