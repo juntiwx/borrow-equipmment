@@ -33,19 +33,33 @@ interface FormValues
 
 // ค่าเริ่มต้นในฟอร์ม
 const initialFormValues: FormValues = {
-  employee_id: "13000852",
-  full_name: "จันทิมา นุชโยธิน",
-  position: "นักวิชาการคอมพิวเตอร์",
-  department: "งานเทคโนโลยีสารสนเทศ",
-  tel: "4203",
-  equipment: "Notebook",
-  purpose: "ทดสอบระบบ",
+  employee_id: "",
+  full_name: "",
+  position: "",
+  department: "",
+  tel: "",
+  equipment: "",
+  purpose: "",
   start_date_time: null,
   end_date_time: null,
-  location: "ทดสอบระบบ",
+  location: "",
   number: 0,
   computers: [],
 };
+// const initialFormValues: FormValues = {
+//   employee_id: "13000852",
+//   full_name: "จันทิมา นุชโยธิน",
+//   position: "นักวิชาการคอมพิวเตอร์",
+//   department: "งานเทคโนโลยีสารสนเทศ",
+//   tel: "4203",
+//   equipment: "Notebook",
+//   purpose: "ทดสอบระบบ",
+//   start_date_time: null,
+//   end_date_time: null,
+//   location: "ทดสอบระบบ",
+//   number: 0,
+//   computers: [],
+// };
 
 // ฟังก์ชันตรวจสอบว่าฟอร์มมีการเปลี่ยนแปลงจากค่าเริ่มต้นหรือไม่
 const isFormChanged = (initial: FormValues, current: FormValues): boolean => {
