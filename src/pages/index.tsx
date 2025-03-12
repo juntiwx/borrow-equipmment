@@ -474,7 +474,7 @@ export default function LoanRequestForm() {
 
             <div className="mt-4 text-center">
               <a
-                href="https://docs.google.com/spreadsheets/d/1fAFzSLBIZBtfKQLFszLTLRzCmEfPxE7MVzHK1s_8PU4/edit"
+                href="https://docs.google.com/spreadsheets/d/1LK4Uz0gJC57zF2zvnDowkh1ZFPzi6sguKaPweZYxaqk/edit"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline"
